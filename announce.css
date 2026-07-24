@@ -1,0 +1,118 @@
+/* ===================================================================
+   Announce templates styling — namespaced .aev (event) / .acn (country)
+   so it can never reach carousel (.art / .slide) or poster (.poster) DOM.
+   Fonts (Gotham Pro) come from the app's @font-face. Artboards are 1080×1080.
+   Values ported verbatim from the approved announce-explore/ demos.
+   =================================================================== */
+
+/* ---------------- EVENT ANNOUNCEMENT ---------------- */
+.aev{
+  width:1080px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box;
+  font-family:'Gotham Pro',system-ui,sans-serif;
+  /* brand warm gradient — sanctioned stops only: coral #e16f79 -> violet #896896 -> blue #4568a9 */
+  background:
+    radial-gradient(116% 106% at 90% 6%, #e16f79 0%, rgba(225,111,121,0) 58%),
+    radial-gradient(120% 116% at 6% 100%, #4568a9 0%, rgba(69,104,169,0) 60%),
+    linear-gradient(210deg, #e16f79 0%, #896896 54%, #4568a9 100%);
+}
+.aev *{box-sizing:border-box;}
+.aev-stripes{
+  position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:repeating-linear-gradient(90deg,
+    rgba(255,255,255,.045) 0px, rgba(255,255,255,.045) 1px,
+    rgba(255,255,255,0) 1px, rgba(255,255,255,0) 14px);
+}
+.aev-bead{
+  position:absolute;pointer-events:none;width:520px;height:520px;bottom:-158px;right:-150px;
+  filter:saturate(1.14) brightness(1.05) drop-shadow(0 16px 30px rgba(90,10,40,.30));
+}
+.aev-content{position:absolute;inset:0;padding:64px 62px;}
+.aev-headline{
+  color:#fff;font-weight:700;font-size:72px;line-height:1.06;
+  letter-spacing:-.02em;max-width:1000px;margin:36px 0 0;
+}
+.aev-lede{
+  color:#fff;font-weight:300;font-size:29px;line-height:1.35;
+  letter-spacing:-.005em;max-width:880px;margin-top:36px;
+}
+.aev-card{
+  position:absolute;left:62px;top:626px;width:672px;
+  background:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.25);border-radius:28px;padding:40px 42px;
+}
+.aev-row{display:flex;align-items:flex-start;gap:20px;}
+.aev-row + .aev-row{margin-top:26px;}
+.aev-ico{flex:0 0 auto;width:30px;height:30px;color:#fff;margin-top:2px;}
+.aev-ico svg{display:block;width:30px;height:30px;}
+.aev-date{font-weight:500;font-size:30px;color:#fff;letter-spacing:.01em;line-height:1;padding-top:4px;}
+.aev-venue{font-weight:700;font-size:30px;color:#fff;line-height:1.22;}
+.aev-addr{font-weight:300;font-size:26px;color:rgba(255,255,255,.82);margin-top:10px;padding-left:50px;letter-spacing:.005em;}
+.aev-footer{
+  position:absolute;left:0;bottom:0;width:1080px;height:104px;
+  background:#fff;display:flex;align-items:center;padding-left:62px;
+}
+.aev-footer img{height:44px;width:auto;display:block;}
+
+/* ---- optional event extras (active only when the new spec fields are set) ---- */
+/* co-brand footer: Efferon left, conference logo pushed to the right edge */
+.aev-footer.cobrand{height:120px;justify-content:space-between;padding-right:62px;}
+.aev-footer.cobrand .aev-eff{height:46px;}
+.aev-conf{height:70px;display:flex;align-items:center;}
+.aev-conf img{height:100%;width:auto;max-width:340px;object-fit:contain;display:block;}
+/* stand / booth-number row in the detail card */
+.aev-booth{font-weight:500;font-size:30px;color:#fff;letter-spacing:.01em;line-height:1;padding-top:4px;}
+.aev-addr + .aev-booth-row{margin-top:24px;}
+/* product device column bottom-right (replaces the granule bead) */
+.aev-dev{position:absolute;pointer-events:none;filter:drop-shadow(-14px 20px 32px rgba(60,15,40,.34));}
+.aev-dev.lps{height:1020px;right:60px;bottom:-306px;}
+.aev-dev.neo{height:700px;right:44px;bottom:132px;}
+/* narrow the text column so the device owns the right side */
+.aev.has-dev .aev-headline{max-width:600px;}
+.aev.has-dev .aev-lede{max-width:560px;}
+.aev.has-dev .aev-card{top:600px;}
+
+/* ---------------- NEW-COUNTRY ANNOUNCEMENT ---------------- */
+.acn-logo{position:absolute;left:54px;bottom:48px;height:52px;width:auto;display:block;z-index:6;}
+.acn{
+  width:1080px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box;
+  background:#dfe8f0;font-family:'Gotham Pro',system-ui,sans-serif;
+}
+.acn *{box-sizing:border-box;}
+/* photo is pre-cropped to a square data URI (see ensurePhoto), so a plain
+   square <img> fills the artboard exactly; object-fit kept for the brief
+   pre-crop live state. */
+.acn-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:32% 60%;
+  filter:saturate(.8) brightness(1.06);}
+/* soft placeholder when no photo uploaded */
+.acn-photo-ph{position:absolute;inset:0;background:
+  radial-gradient(90% 70% at 20% 12%, #eaf3fb 0%, rgba(234,243,251,0) 60%),
+  linear-gradient(180deg, #eaf3fb 0%, #dbe7f1 46%, #c7d6e2 100%);}
+.acn-wash-top{position:absolute;inset:0;background:linear-gradient(to bottom,
+  rgba(255,255,255,.95) 0%, rgba(255,255,255,.82) 26%, rgba(255,255,255,.64) 52%,
+  rgba(255,255,255,.56) 78%, rgba(255,255,255,.54) 100%);}
+.acn-wash-warm{position:absolute;inset:0;background:radial-gradient(120% 90% at 20% 6%,
+  rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%);}
+/* Flag = a canvas-baked waving-cloth PNG (see ensureFlag). Shadow via
+   filter:drop-shadow on the <img> (survives export; box-shadow does not). */
+.acn-flag{position:absolute;top:14px;right:-64px;width:672px;height:480px;transform:rotate(-3deg);}
+.acn-flag img{display:block;width:100%;height:100%;
+  filter:drop-shadow(-10px 16px 24px rgba(60,40,45,.20));}
+.acn-map{position:absolute;left:34px;top:410px;width:556px;height:516px;
+  filter:drop-shadow(5px 9px 16px rgba(70,60,80,.28));}
+.acn-map svg{display:block;width:100%;height:100%;}
+.acn-shield{position:absolute;left:300px;top:524px;width:116px;height:132px;}
+.acn-shield svg{display:block;width:100%;height:100%;}
+.acn-product{position:absolute;right:-395px;bottom:-635px;height:1500px;width:auto;
+  filter:drop-shadow(-10px 14px 34px rgba(40,30,35,.26));}
+.acn-title{position:absolute;left:70px;top:90px;z-index:5;}
+.acn-t-en{font-weight:700;color:#4568a9;font-size:70px;line-height:1.06;letter-spacing:-.5px;}
+.acn-t-en .reg{font-size:32px;font-weight:700;vertical-align:super;line-height:0;}
+.acn-t-en .pl{color:#d4213d;}
+.acn-t-pl{margin-top:16px;font-weight:500;color:#4568a9;font-size:48px;line-height:1.05;letter-spacing:-.3px;}
+.acn-t-pl .reg{font-size:22px;font-weight:500;vertical-align:super;line-height:0;}
+
+/* ---------------- panel edit fields (app chrome) ---------------- */
+.ann-f{display:block;margin-bottom:12px;}
+.ann-f > span{display:block;font-size:10.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#8a8a90;margin-bottom:5px;}
+.ann-f textarea,.ann-f input,.ann-f select{width:100%;font:inherit;font-size:13px;padding:8px 10px;border:1px solid rgba(0,0,0,.14);border-radius:8px;background:#fff;color:#231f20;resize:vertical;}

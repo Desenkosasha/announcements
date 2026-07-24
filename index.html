@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efferon Announcements</title>
+<link rel="stylesheet" href="announce.css?v=6">
+<style>
+  /* ---- Efferon Gotham Pro (used inside the artboards, via announce.css) ---- */
+  @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_black.ttf') format('truetype');font-weight:900;font-display:block;}
+  @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_bold.ttf') format('truetype');font-weight:700;font-display:block;}
+  @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_medium.ttf') format('truetype');font-weight:500;font-display:block;}
+  @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro.ttf') format('truetype');font-weight:400;font-display:block;}
+  @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_light.ttf') format('truetype');font-weight:300;font-display:block;}
+
+  :root{
+    --bg:#f5f5f7; --panel:#fff; --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#8e8e93;
+    --line:rgba(0,0,0,.09); --line2:rgba(0,0,0,.06);
+    --coral:#e16f79; --coral-d:#d15864; --field:#fff; --sel:#f0f0f2;
+    --radius:14px; --shadow:0 1px 3px rgba(0,0,0,.06),0 8px 30px rgba(0,0,0,.06);
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* ---------------- top bar ---------------- */
+  .top{height:56px;flex:0 0 auto;display:flex;align-items:center;gap:20px;
+    padding:0 22px;background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line);z-index:10;}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:15px;letter-spacing:-.01em;}
+  .brand .blogo{height:23px;width:auto;display:block;}
+  .brand .sub{color:var(--ink3);font-weight:400;}
+  /* macOS segmented control */
+  .seg{display:inline-flex;background:#e9e9eb;border-radius:9px;padding:2px;gap:2px;}
+  .seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;
+    color:var(--ink);padding:5px 16px;border-radius:7px;cursor:pointer;transition:.15s;letter-spacing:-.01em;}
+  .seg button.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.16);}
+  .spacer{flex:1;}
+  .keybtn{appearance:none;border:1px solid var(--line);background:#fff;font:inherit;font-size:12.5px;
+    font-weight:500;color:var(--ink);padding:6px 13px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px;}
+  .keybtn .kd{width:7px;height:7px;border-radius:50%;background:#c9c9ce;}
+  .keybtn.ok .kd{background:#34c759;}
+
+  /* ---------------- workspace ---------------- */
+  .work{flex:1;display:flex;min-height:0;}
+  .screen{flex:1;display:none;min-height:0;}
+  .screen.on{display:flex;}
+  .stagewrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;min-width:0;}
+  .stage{background:transparent;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.16);}
+  .stage > *{transform-origin:top left;}
+
+  /* right panel */
+  .panel{flex:0 0 380px;background:var(--panel);border-left:1px solid var(--line);
+    overflow-y:auto;padding:8px 0 40px;}
+  .sec{padding:20px 24px;border-bottom:1px solid var(--line2);}
+  .sec:last-child{border-bottom:0;}
+  .sec-h{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px;}
+  .note{font-size:12px;line-height:1.5;color:var(--ink2);margin-top:10px;}
+
+  .f{display:block;margin-bottom:13px;}
+  .f:last-child{margin-bottom:0;}
+  .f > span{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:6px;letter-spacing:-.01em;}
+  .f input,.f textarea,.f select{width:100%;font:inherit;font-size:13.5px;color:var(--ink);
+    padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--field);
+    resize:vertical;transition:.15s;line-height:1.4;}
+  .f input:focus,.f textarea:focus,.f select:focus{outline:0;border-color:var(--coral);
+    box-shadow:0 0 0 3px rgba(225,111,121,.16);}
+  .f select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
+
+  /* mini segmented (product) */
+  .seg2{display:flex;background:#ececed;border-radius:10px;padding:2px;gap:2px;}
+  .seg2 button{flex:1;appearance:none;border:0;background:transparent;font:inherit;font-size:12.5px;
+    font-weight:500;color:var(--ink);padding:7px 0;border-radius:8px;cursor:pointer;transition:.15s;}
+  .seg2 button.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.14);}
+
+  .btn{appearance:none;border:0;font:inherit;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
+    padding:11px 16px;border-radius:11px;cursor:pointer;width:100%;transition:.15s;}
+  .btn-primary{background:var(--coral);color:#fff;}
+  .btn-primary:hover{background:var(--coral-d);}
+  .btn-primary:disabled{opacity:.5;cursor:default;}
+  .btn-ghost{background:#f0f0f2;color:var(--ink);}
+  .btn-ghost:hover{background:#e8e8ea;}
+  .btn + .btn{margin-top:9px;}
+
+  /* upload row */
+  .upl{display:flex;align-items:center;gap:10px;}
+  .upl label{flex:0 0 auto;background:#f0f0f2;color:var(--ink);font-size:12.5px;font-weight:500;
+    padding:8px 13px;border-radius:9px;cursor:pointer;transition:.15s;}
+  .upl label:hover{background:#e8e8ea;}
+  .upl .fn{font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .upl input[type=file]{display:none;}
+  .clr{appearance:none;border:0;background:transparent;color:var(--coral-d);font:inherit;font-size:12px;
+    font-weight:500;cursor:pointer;padding:2px 4px;}
+
+  .disc summary{list-style:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);
+    display:flex;align-items:center;gap:7px;padding:2px 0;}
+  .disc summary::-webkit-details-marker{display:none;}
+  .disc summary .chev{transition:.2s;color:var(--ink3);}
+  .disc[open] summary .chev{transform:rotate(90deg);}
+  .disc .body{margin-top:13px;}
+
+  .prog{font-size:12px;color:var(--ink2);margin-top:10px;min-height:15px;}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:#1d1d1f;color:#fff;font-size:13px;font-weight:500;padding:11px 20px;border-radius:12px;
+    box-shadow:0 10px 34px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.28s;z-index:50;max-width:80vw;}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+  /* password gate */
+  .gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+  .gate.hidden{display:none;}
+  .gate .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:36px 34px;width:340px;text-align:center;}
+  .gate .glogo{height:26px;margin-bottom:20px;}
+  .gate h2{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;}
+  .gate p{font-size:13px;color:var(--ink2);margin-bottom:20px;}
+  .gate input{width:100%;font:inherit;font-size:14px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;text-align:center;margin-bottom:11px;}
+  .gate input:focus{outline:0;border-color:var(--coral);box-shadow:0 0 0 3px rgba(225,111,121,.16);}
+  .gate .err{color:var(--coral-d);font-size:12.5px;min-height:16px;margin-bottom:8px;}
+  .gate button{width:100%;background:var(--coral);color:#fff;border:0;font:inherit;font-size:14px;font-weight:600;padding:11px;border-radius:11px;cursor:pointer;}
+  .gate button:hover{background:var(--coral-d);}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="card">
+    <img class="glogo" src="assets/logo/efferon-logo.svg" alt="Efferon">
+    <h2>Efferon Announcements</h2>
+    <p>Enter the password to continue.</p>
+    <form id="gateForm">
+      <input id="gatePw" type="password" placeholder="Password" autocomplete="current-password" autofocus>
+      <div class="err" id="gateErr"></div>
+      <button type="submit">Unlock</button>
+    </form>
+  </div>
+</div>
+<script>
+(function(){
+  var PW_HASH='88f85759ede2383d2f8490b87720bb7b165d591b2035f6d0749bbe5bc6195166';
+  var gate=document.getElementById('gate');
+  function unlock(){ gate.classList.add('hidden'); }
+  if(sessionStorage.getItem('eff_ann_ok')==='1') unlock();
+  async function sha(s){ var b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join(''); }
+  document.getElementById('gateForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var h=await sha(document.getElementById('gatePw').value);
+    if(h===PW_HASH){ sessionStorage.setItem('eff_ann_ok','1'); unlock(); }
+    else { document.getElementById('gateErr').textContent='Wrong password.'; document.getElementById('gatePw').select(); }
+  });
+})();
+</script>
+
+<div class="top">
+  <div class="brand"><img class="blogo" src="assets/logo/efferon-logo.svg" alt="Efferon">Announcements <span class="sub">· social posts</span></div>
+  <div class="seg" id="modeSeg">
+    <button data-mode="event" class="on">Event</button>
+    <button data-mode="country">New country</button>
+  </div>
+  <div class="spacer"></div>
+  <button class="keybtn" id="keyBtn"><span class="kd"></span>API key</button>
+</div>
+
+<div class="work">
+  <!-- ================= EVENT ================= -->
+  <section class="screen on" id="scr-event">
+    <div class="stagewrap"><div class="stage" id="eventStage"></div></div>
+    <aside class="panel">
+      <div class="sec">
+        <details class="disc">
+          <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>Generate from text</summary>
+          <div class="body">
+            <label class="f"><textarea id="evSrc" rows="5" placeholder="Paste the event details (name, dates, venue, booth…) and let AI fill the fields."></textarea></label>
+            <button class="btn btn-ghost" id="evGen">Generate fields</button>
+            <p class="note">Uses your Anthropic key. Fills the text fields below, which you can then fine-tune.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="sec"><div class="sec-h">Design</div>
+        <label class="f"><span>Product column</span></label>
+        <div class="seg2" id="evProduct">
+          <button data-p="lps" class="on">LPS</button>
+          <button data-p="neo">NEO</button>
+        </div>
+        <label class="f" style="margin-top:14px"><span>Conference logo</span></label>
+        <div class="upl">
+          <label for="evConf">Upload</label>
+          <input id="evConf" type="file" accept="image/*">
+          <span class="fn" id="evConfName">placeholder</span>
+          <button class="clr" id="evConfClr">Remove</button>
+        </div>
+        <p class="note">Sits on the right of the white footer. PNG or SVG with transparent background works best.</p>
+      </div>
+
+      <div class="sec"><div class="sec-h">Text</div>
+        <label class="f"><span>Title</span><textarea id="evTitle" rows="2"></textarea></label>
+        <label class="f"><span>Lede</span><textarea id="evLede" rows="3"></textarea></label>
+        <label class="f"><span>Date</span><input id="evDate" type="text"></label>
+        <label class="f"><span>Venue</span><input id="evVenue" type="text"></label>
+        <label class="f"><span>Address</span><input id="evAddr" type="text"></label>
+        <label class="f"><span>Booth / stand number</span><input id="evBooth" type="text" placeholder="e.g. Booth 4.28 (optional)"></label>
+      </div>
+
+      <div class="sec"><div class="sec-h">Export</div>
+        <button class="btn btn-primary" id="evPng">Download PNG</button>
+        <p class="prog" id="evProg"></p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ================= COUNTRY ================= -->
+  <section class="screen" id="scr-country">
+    <div class="stagewrap"><div class="stage" id="countryStage"></div></div>
+    <aside class="panel">
+      <div class="sec"><div class="sec-h">New country</div>
+        <label class="f"><span>Country</span><input id="cnCountry" type="text" placeholder="e.g. Germany"></label>
+        <button class="btn btn-primary" id="cnGen">Generate flag, phrase &amp; photo</button>
+        <p class="note">Types a country, AI picks the flag, translates the phrase and finds a recognizable landscape photo. Uses your Anthropic key.</p>
+      </div>
+
+      <div class="sec"><div class="sec-h">Design</div>
+        <label class="f"><span>Product</span><select id="cnProduct"><option value="lps">LPS</option><option value="ct">CT</option><option value="neo">NEO</option></select></label>
+        <label class="f"><span>Background photo (override)</span></label>
+        <div class="upl">
+          <label for="cnPhoto">Upload</label>
+          <input id="cnPhoto" type="file" accept="image/*">
+          <span class="fn" id="cnPhotoName">auto</span>
+        </div>
+        <p class="note">Optional. Your own bright photo of the country replaces the auto-found one.</p>
+      </div>
+
+      <div class="sec"><div class="sec-h">Text</div>
+        <label class="f"><span>English line</span><input id="cnEN" type="text"></label>
+        <label class="f"><span>Highlight word</span><input id="cnEmph" type="text"></label>
+        <label class="f"><span>Local line</span><input id="cnLocal" type="text"></label>
+      </div>
+
+      <div class="sec"><div class="sec-h">Export</div>
+        <button class="btn btn-primary" id="cnPng">Download PNG</button>
+        <p class="prog" id="cnProg"></p>
+      </div>
+    </aside>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="vendor/html-to-image.js"></script>
+<script type="module">
+import { newEvent, newCountry, demoCountry, ANNOUNCE_DIMS } from './js/announce-model.js?v=2';
+import { renderEvent, renderCountry, ensureFlag, ensurePhoto } from './js/announce-render.js?v=6';
+import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=2';
+import { elementToPngBlob } from './js/deck-export.js';
+import * as geoMod from './js/announce-geo.js?v=1';
+
+const $ = id => document.getElementById(id);
+const KEY_STORAGE = 'eff_key';
+let toastT;
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),3200); }
+
+/* ---------- placeholder conference logo (web-safe font so it rasterizes in an <img>) ---------- */
+const CONF_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+`<svg viewBox="0 0 300 92" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="ce" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17b7a6"/><stop offset="1" stop-color="#0e8f7f"/></linearGradient></defs>
+  <circle cx="46" cy="46" r="42" fill="url(#ce)"/>
+  <path d="M22 47 h11 l6 -15 l9 30 l7 -18 h16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="104" y="44" font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="38" fill="#1f2b46" letter-spacing="1">ISICEM</text>
+  <text x="105" y="72" font-family="Helvetica,Arial,sans-serif" font-weight="600" font-size="17" fill="#e07a1f" letter-spacing="2">2026 · BRUSSELS</text>
+</svg>`);
+
+/* ---------- API key ---------- */
+function refreshKeyBtn(){ const has=!!(localStorage.getItem(KEY_STORAGE)||'').trim(); $('keyBtn').classList.toggle('ok',has); $('keyBtn').lastChild.textContent = has?'API key ✓':'API key'; }
+$('keyBtn').addEventListener('click', ()=>{
+  const cur=(localStorage.getItem(KEY_STORAGE)||'').trim();
+  const v=window.prompt('Paste your Anthropic API key (sk-ant-…). Stored only in this browser, sent only to api.anthropic.com.', cur);
+  if(v!==null){ localStorage.setItem(KEY_STORAGE, v.trim()); refreshKeyBtn(); toast(v.trim()?'API key saved.':'API key cleared.'); }
+});
+refreshKeyBtn();
+
+/* ================= state ================= */
+let eventSpec = { ...newEvent(),
+  title:'Meet Efferon at ISICEM 2026',
+  lede:'Visit our team to discuss extracorporeal blood purification in sepsis and critical care.',
+  date:'March 17–20, 2026', venue:'SQUARE — Brussels Convention Centre',
+  address:'Rue Mont des Arts, 1000 Brussels, Belgium',
+  product:'lps', booth:'Booth 4.28', confLogoDataUrl:CONF_PLACEHOLDER };
+let countrySpec = null, countryProduct='lps', geoReady=false;
+
+/* ================= fit / render ================= */
+function fitStage(stageId, node){
+  const stage=$(stageId); if(!stage) return;
+  const wrap=stage.parentElement;
+  const availW=wrap.clientWidth-80, availH=wrap.clientHeight-80;
+  const [W,H]=ANNOUNCE_DIMS;
+  const scale=Math.min(availW/W, availH/H, 0.62);
+  node.style.transform=`scale(${scale})`;
+  stage.style.width=(W*scale)+'px'; stage.style.height=(H*scale)+'px';
+}
+function renderEventStage(){
+  const stage=$('eventStage'); const n=renderEvent(eventSpec);
+  stage.innerHTML=''; stage.appendChild(n); fitStage('eventStage', n);
+}
+function fillEventFields(){
+  $('evTitle').value=eventSpec.title||''; $('evLede').value=eventSpec.lede||'';
+  $('evDate').value=eventSpec.date||''; $('evVenue').value=eventSpec.venue||'';
+  $('evAddr').value=eventSpec.address||''; $('evBooth').value=eventSpec.booth||'';
+  document.querySelectorAll('#evProduct button').forEach(b=>b.classList.toggle('on', b.dataset.p===(eventSpec.product||'')));
+}
+
+let geoPromise=null;
+function ensureGeo(){ if(geoPromise) return geoPromise; geoPromise=geoMod.initGeo().then(()=>{geoReady=true;}).catch(()=>{}); return geoPromise; }
+function renderCountryStage(){
+  const stage=$('countryStage'); if(!countrySpec) countrySpec=demoCountry();
+  countryProduct=countrySpec.product||'lps';
+  const n=renderCountry(countrySpec, geoReady?geoMod:null);
+  stage.innerHTML=''; stage.appendChild(n); fitStage('countryStage', n);
+  $('cnCountry').value=countrySpec.country||''; $('cnEN').value=countrySpec.phraseEN||'';
+  $('cnEmph').value=countrySpec.emphasis||''; $('cnLocal').value=countrySpec.phraseLocal||''; $('cnProduct').value=countrySpec.product||'lps';
+  ensureGeo().then(async()=>{ await ensureFlag(countrySpec, geoMod); await ensurePhoto(countrySpec);
+    if($('scr-country').classList.contains('on')) reRenderCountry(); });
+}
+function reRenderCountry(){ const stage=$('countryStage'); if(!countrySpec) return; const n=renderCountry(countrySpec, geoReady?geoMod:null); stage.innerHTML=''; stage.appendChild(n); fitStage('countryStage', n); }
+
+/* ================= mode switch ================= */
+document.querySelectorAll('#modeSeg button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const m=b.dataset.mode;
+    $('scr-event').classList.toggle('on', m==='event');
+    $('scr-country').classList.toggle('on', m==='country');
+    if(m==='event') renderEventStage(); else renderCountryStage();
+  });
+});
+window.addEventListener('resize', ()=>{
+  if($('scr-event').classList.contains('on')){ const n=$('eventStage').firstElementChild; if(n) fitStage('eventStage',n); }
+  else { const n=$('countryStage').firstElementChild; if(n) fitStage('countryStage',n); }
+});
+
+/* ================= EVENT wiring ================= */
+[['evTitle','title'],['evLede','lede'],['evDate','date'],['evVenue','venue'],['evAddr','address'],['evBooth','booth']].forEach(([id,key])=>{
+  $(id).addEventListener('input', ()=>{ eventSpec[key]=$(id).value; renderEventStage(); });
+});
+document.querySelectorAll('#evProduct button').forEach(b=>{
+  b.addEventListener('click', ()=>{ document.querySelectorAll('#evProduct button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.product=b.dataset.p; renderEventStage(); });
+});
+$('evConf').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ eventSpec.confLogoDataUrl=r.result; $('evConfName').textContent=f.name; renderEventStage(); };
+  r.readAsDataURL(f); e.target.value='';
+});
+$('evConfClr').addEventListener('click', ()=>{ eventSpec.confLogoDataUrl=null; $('evConfName').textContent='none'; renderEventStage(); });
+$('evGen').addEventListener('click', async ()=>{
+  const text=$('evSrc').value.trim(); if(!text){ toast('Paste some event text first.'); return; }
+  const btn=$('evGen'); btn.disabled=true; btn.textContent='Generating…';
+  try{
+    const g=await planEvent(text,{lang:'en'});
+    // keep the current design (product/booth/logo), replace only the text fields
+    Object.assign(eventSpec, { title:g.title, lede:g.lede, date:g.date, venue:g.venue, address:g.address });
+    fillEventFields(); renderEventStage(); toast('Fields generated. Fine-tune below.');
+  }catch(err){ console.error(err); toast('Could not generate: '+String(err.message||err)); }
+  finally{ btn.disabled=false; btn.textContent='Generate fields'; }
+});
+$('evPng').addEventListener('click', async ()=>{
+  const btn=$('evPng'); btn.disabled=true; $('evProg').textContent='Rendering…';
+  try{
+    const blob=await elementToPngBlob(renderEvent(eventSpec), ANNOUNCE_DIMS[0], ANNOUNCE_DIMS[1]);
+    downloadBlob(blob,'efferon-event.png'); $('evProg').textContent='Downloaded efferon-event.png';
+  }catch(err){ console.error(err); $('evProg').textContent='Failed: '+String(err.message||err); }
+  finally{ btn.disabled=false; }
+});
+
+/* ================= COUNTRY wiring ================= */
+[['cnEN','phraseEN'],['cnEmph','emphasis'],['cnLocal','phraseLocal'],['cnCountry','country']].forEach(([id,key])=>{
+  $(id).addEventListener('input', ()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec[key]=$(id).value; reRenderCountry(); });
+});
+$('cnProduct').addEventListener('change', ()=>{ if(!countrySpec) countrySpec=demoCountry(); countryProduct=$('cnProduct').value; countrySpec.product=countryProduct; reRenderCountry(); });
+$('cnPhoto').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec.photoDataUrl=r.result; countrySpec.photoSrc=null; countrySpec._photoSquared=false; $('cnPhotoName').textContent=f.name; ensurePhoto(countrySpec).then(reRenderCountry); };
+  r.readAsDataURL(f); e.target.value='';
+});
+async function generateCountry(name){
+  const c=await resolveCountry(name,{product:countryProduct});
+  const photo=await fetchScenePhoto(c.scene);
+  countrySpec={ ...c, product:countryProduct, photoDataUrl:photo, photoSrc:null };
+  await ensureGeo(); await ensureFlag(countrySpec, geoMod); await ensurePhoto(countrySpec);
+}
+$('cnGen').addEventListener('click', async ()=>{
+  const name=$('cnCountry').value.trim(); if(!name){ toast('Type a country name first.'); return; }
+  const btn=$('cnGen'); btn.disabled=true; const old=btn.textContent; btn.textContent='Generating…';
+  try{ await generateCountry(name); renderCountryStage(); toast('Flag, phrase and photo updated.'); }
+  catch(err){ console.error(err); toast('Could not generate: '+String(err.message||err)); }
+  finally{ btn.disabled=false; btn.textContent=old; }
+});
+$('cnPng').addEventListener('click', async ()=>{
+  const btn=$('cnPng'); btn.disabled=true; $('cnProg').textContent='Rendering…';
+  try{
+    await ensureGeo(); if(!countrySpec) countrySpec=demoCountry();
+    await ensureFlag(countrySpec, geoMod); await ensurePhoto(countrySpec);
+    const blob=await elementToPngBlob(renderCountry(countrySpec, geoReady?geoMod:null), ANNOUNCE_DIMS[0], ANNOUNCE_DIMS[1]);
+    downloadBlob(blob,'efferon-country.png'); $('cnProg').textContent='Downloaded efferon-country.png';
+  }catch(err){ console.error(err); $('cnProg').textContent='Failed: '+String(err.message||err); }
+  finally{ btn.disabled=false; }
+});
+
+/* ---------- download helper ---------- */
+function downloadBlob(blob, name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),10000); }
+
+/* ---------- boot ---------- */
+fillEventFields();
+$('evConfName').textContent='placeholder (upload your own)';
+const startMode = new URLSearchParams(location.search).get('mode')==='country' ? 'country' : 'event';
+if(startMode==='country'){
+  document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on', x.dataset.mode==='country'));
+  $('scr-event').classList.remove('on'); $('scr-country').classList.add('on');
+  renderCountryStage();
+}else{
+  renderEventStage();
+  requestAnimationFrame(()=>{ const n=$('eventStage').firstElementChild; if(n) fitStage('eventStage',n); });
+}
+</script>
+</body></html>

@@ -39,9 +39,13 @@ export function demoEvent() {
 }
 
 /* ---------- New-country announcement ----------
-   iso        ISO alpha-2 (drives flag + map silhouette via announce-geo)
-   phraseEN   English headline; `emphasis` word is highlighted red
-   phraseLocal same message in the country's official language
+   iso        ISO alpha-2 (drives flag + map outline via announce-geo)
+   titleTop   headline line 1, uppercased on render ("NOW AVAILABLE")
+   titleBottom headline line 2 ("IN CROATIA"); auto from `country` when empty
+   emphasis   the word painted red in line 2 (auto = country, uppercased)
+   phraseLocal same message in the country's official language (the subline)
+   palette    'ref' = approved Croatia post (navy + crimson) | 'brand' = brandbook
+   phraseEN   legacy English sentence kept for the AI round-trip (unused on render)
    langName   e.g. "Polish" (for UI / prompts)
    photoDataUrl user-uploaded background photo (null → soft placeholder)
    product    which device label: 'lps' | 'ct' | 'neo'
@@ -52,15 +56,24 @@ export function newCountry() {
     lang: 'en',
     country: '',
     iso: '',
-    phraseEN: '',
+    titleTop: 'NOW AVAILABLE',
+    titleBottom: '',
     emphasis: '',
+    phraseEN: '',
     phraseLocal: '',
     langName: '',
     scene: '',
     photoDataUrl: null,
     photoSrc: null,
     product: 'lps',
+    palette: 'ref',
   };
+}
+
+/* Headline line 2 for a country name ("Croatia" -> "IN CROATIA"). */
+export function countryTitleBottom(name) {
+  const n = String(name || '').trim();
+  return n ? 'IN ' + n.toUpperCase() : '';
 }
 
 export function demoCountry() {
@@ -69,14 +82,17 @@ export function demoCountry() {
     lang: 'en',
     country: 'Poland',
     iso: 'PL',
-    phraseEN: 'Efferon® LPS is available in Poland',
+    titleTop: 'NOW AVAILABLE',
+    titleBottom: 'IN POLAND',
     emphasis: 'Poland',
-    phraseLocal: 'Efferon® LPS dostępny w Polsce',
+    phraseEN: 'Efferon® LPS is available in Poland',
+    phraseLocal: 'Efferon® LPS jest dostępny w Polsce',
     langName: 'Polish',
     scene: 'Wawel Castle Krakow Vistula river',
     photoDataUrl: null,
     photoSrc: 'assets/demo/poland.jpg',
     product: 'lps',
+    palette: 'ref',
   };
 }
 

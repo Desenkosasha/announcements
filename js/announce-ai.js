@@ -151,16 +151,19 @@ export async function fetchScenePhoto(query){
     const params = new URLSearchParams({
       action:'query', format:'json', origin:'*',
       generator:'search', gsrsearch:`filetype:bitmap ${q}`, gsrlimit:'12', gsrnamespace:'6',
-      prop:'imageinfo', iiprop:'url|mime|size', iiurlwidth:'1600',
+      prop:'imageinfo', iiprop:'url|mime|size', iiurlwidth:'3200',
     });
     const res = await fetch('https://commons.wikimedia.org/w/api.php?' + params);
     const data = await res.json();
     const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
     const infos = pages.map(p => p.imageinfo && p.imageinfo[0]).filter(Boolean)
       .filter(i => /jpeg|jpg|png/i.test(i.mime || ''));
-    // prefer landscape-oriented, reasonably large
+    // Prefer landscape-oriented AND big enough that the 2160² square crop is
+    // real pixels rather than an upscale (that upscale is what reads as
+    // "the photo went pixelated"). Fall back progressively.
     const landscape = infos.filter(i => (i.thumbwidth || i.width) >= (i.thumbheight || i.height));
-    const pick = landscape[0] || infos[0];
+    const bigEnough = landscape.filter(i => (i.width || 0) >= 2400);
+    const pick = bigEnough[0] || landscape[0] || infos[0];
     if(!pick) return null;
     const blob = await (await fetch(pick.thumburl || pick.url)).blob();
     return await blobToDataURL(blob);

@@ -6,7 +6,9 @@
    Powers the "new country announcement" social post template.
 
    Everything is vendored locally (no runtime network, no CDN):
-     ../vendor/world-countries-110m.json   TopoJSON boundaries (world-atlas)
+     ../vendor/world-countries-50m.json    TopoJSON boundaries (world-atlas 1:50m —
+                                           110m was too coarse: small countries such as
+                                           North Macedonia degenerated into a blob)
      ../vendor/iso-lookup.json             numeric/name -> ISO lookup (world-countries)
      ../vendor/d3-geo.esm.js               d3-geo (bundled, self-contained)
      ../vendor/topojson-client.esm.js      topojson-client (bundled)
@@ -17,6 +19,7 @@
      resolveISO(nameOrCode)  -> "PL" | null
      countryPathD(iso2,opts) -> SVG path 'd' string fit to width x height | null
      countryViewBox(iso2,opts) -> "0 0 W H"
+     countryCentroid(iso2,opts) -> [x, y] inside the fitted box (badge anchor)
      flagHref(iso2)          -> href string for the flag (absolute URL to vendored svg)
      listCountries()         -> [{iso2, name}] sorted by name
    ============================================================ */
@@ -48,7 +51,7 @@ export async function initGeo() {
   if (_ready) return _ready;
   _ready = (async () => {
     const [topo, lookup] = await Promise.all([
-      fetch(assetUrl('../vendor/world-countries-110m.json')).then(r => r.json()),
+      fetch(assetUrl('../vendor/world-countries-50m.json')).then(r => r.json()),
       fetch(assetUrl('../vendor/iso-lookup.json')).then(r => r.json()),
     ]);
 
@@ -109,6 +112,28 @@ export function countryPathD(iso2, opts = {}) {
   const path = geoPath(projection);
   const d = path(feat);
   return d || null;
+}
+
+/* Projected centroid of the territory inside the same fitted box as
+   countryPathD() — used to anchor the approval badge on the map. Returns
+   [x, y] or null. */
+export function countryCentroid(iso2, opts = {}) {
+  ensureLoaded();
+  if (!iso2) return null;
+  const feat = _featureByIso2.get(String(iso2).toUpperCase());
+  if (!feat) return null;
+
+  const width = opts.width || 300;
+  const height = opts.height || 230;
+  const padding = opts.padding != null ? opts.padding : 8;
+
+  const projection = geoMercator().fitExtent(
+    [[padding, padding], [width - padding, height - padding]],
+    feat
+  );
+  const c = geoPath(projection).centroid(feat);
+  if (!c || !isFinite(c[0]) || !isFinite(c[1])) return null;
+  return c;
 }
 
 export function countryViewBox(iso2, opts = {}) {

@@ -220,18 +220,21 @@
 
       <div class="sec"><div class="sec-h">Design</div>
         <label class="f"><span>Product</span><select id="cnProduct"><option value="lps">LPS</option><option value="ct">CT</option><option value="neo">NEO</option></select></label>
+        <label class="f"><span>Colours</span><select id="cnPalette"><option value="ref">Navy + crimson (approved post)</option><option value="brand">Brandbook blue + red</option></select></label>
         <label class="f"><span>Background photo (override)</span></label>
         <div class="upl">
           <label for="cnPhoto">Upload</label>
           <input id="cnPhoto" type="file" accept="image/*">
           <span class="fn" id="cnPhotoName">auto</span>
         </div>
-        <p class="note">Optional. Your own bright photo of the country replaces the auto-found one.</p>
+        <p class="note">Optional. Your own bright photo of the country replaces the auto-found one. Use at least 2160&times;2160&nbsp;px (the post exports at 2160&times;2160) — a smaller file has to be scaled up and looks soft.</p>
+        <p class="note" id="cnPhotoWarn" style="display:none"></p>
       </div>
 
       <div class="sec"><div class="sec-h">Text</div>
-        <label class="f"><span>English line</span><input id="cnEN" type="text"></label>
-        <label class="f"><span>Highlight word</span><input id="cnEmph" type="text"></label>
+        <label class="f"><span>Headline line 1</span><input id="cnTop" type="text" placeholder="NOW AVAILABLE"></label>
+        <label class="f"><span>Headline line 2</span><input id="cnBottom" type="text" placeholder="IN CROATIA"></label>
+        <label class="f"><span>Highlight word (red)</span><input id="cnEmph" type="text"></label>
         <label class="f"><span>Local line</span><input id="cnLocal" type="text"></label>
       </div>
 
@@ -247,11 +250,11 @@
 
 <script src="vendor/html-to-image.js"></script>
 <script type="module">
-import { newEvent, newCountry, demoCountry, ANNOUNCE_DIMS } from './js/announce-model.js?v=2';
-import { renderEvent, renderCountry, ensureFlag, ensurePhoto } from './js/announce-render.js?v=6';
-import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=2';
+import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=3';
+import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=7';
+import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=3';
 import { elementToPngBlob } from './js/deck-export.js';
-import * as geoMod from './js/announce-geo.js?v=1';
+import * as geoMod from './js/announce-geo.js?v=2';
 
 const $ = id => document.getElementById(id);
 const KEY_STORAGE = 'eff_key';
@@ -314,9 +317,12 @@ function renderCountryStage(){
   countryProduct=countrySpec.product||'lps';
   const n=renderCountry(countrySpec, geoReady?geoMod:null);
   stage.innerHTML=''; stage.appendChild(n); fitStage('countryStage', n);
-  $('cnCountry').value=countrySpec.country||''; $('cnEN').value=countrySpec.phraseEN||'';
-  $('cnEmph').value=countrySpec.emphasis||''; $('cnLocal').value=countrySpec.phraseLocal||''; $('cnProduct').value=countrySpec.product||'lps';
+  $('cnCountry').value=countrySpec.country||'';
+  $('cnTop').value=countrySpec.titleTop||''; $('cnBottom').value=countrySpec.titleBottom||'';
+  $('cnEmph').value=countrySpec.emphasis||''; $('cnLocal').value=countrySpec.phraseLocal||'';
+  $('cnProduct').value=countrySpec.product||'lps'; $('cnPalette').value=countrySpec.palette||'ref';
   ensureGeo().then(async()=>{ await ensureFlag(countrySpec, geoMod); await ensurePhoto(countrySpec);
+    photoWarn(countrySpec);
     if($('scr-country').classList.contains('on')) reRenderCountry(); });
 }
 function reRenderCountry(){ const stage=$('countryStage'); if(!countrySpec) return; const n=renderCountry(countrySpec, geoReady?geoMod:null); stage.innerHTML=''; stage.appendChild(n); fitStage('countryStage', n); }
@@ -370,19 +376,57 @@ $('evPng').addEventListener('click', async ()=>{
 });
 
 /* ================= COUNTRY wiring ================= */
-[['cnEN','phraseEN'],['cnEmph','emphasis'],['cnLocal','phraseLocal'],['cnCountry','country']].forEach(([id,key])=>{
+[['cnTop','titleTop'],['cnBottom','titleBottom'],['cnEmph','emphasis'],['cnLocal','phraseLocal']].forEach(([id,key])=>{
   $(id).addEventListener('input', ()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec[key]=$(id).value; reRenderCountry(); });
 });
+/* Typing a country name re-derives line 2 + the red word, unless the editor has
+   already typed their own line 2. */
+$('cnCountry').addEventListener('input', ()=>{
+  if(!countrySpec) countrySpec=demoCountry();
+  const name=$('cnCountry').value;
+  const wasAuto = !countrySpec.titleBottom || countrySpec.titleBottom===countryTitleBottom(countrySpec.country);
+  countrySpec.country=name;
+  if(wasAuto){ countrySpec.titleBottom=countryTitleBottom(name); $('cnBottom').value=countrySpec.titleBottom; }
+  countrySpec.emphasis=name; $('cnEmph').value=name;
+  reRenderCountry();
+  /* The flag + map outline are fully offline (vendored atlas + flag SVGs), so
+     swap them as soon as the name resolves — no API key needed. Only the local
+     translation and the background photo still need Generate. */
+  ensureGeo().then(async()=>{
+    if($('cnCountry').value!==name) return;                 // stale keystroke
+    let iso=null; try{ iso=geoMod.resolveISO(name); }catch(_){ iso=null; }
+    if(!iso || iso===countrySpec.iso) return;
+    countrySpec.iso=iso; countrySpec.flagDataUrl=null;
+    await ensureFlag(countrySpec, geoMod);
+    if($('cnCountry').value===name) reRenderCountry();
+  });
+});
 $('cnProduct').addEventListener('change', ()=>{ if(!countrySpec) countrySpec=demoCountry(); countryProduct=$('cnProduct').value; countrySpec.product=countryProduct; reRenderCountry(); });
+$('cnPalette').addEventListener('change', ()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec.palette=$('cnPalette').value; reRenderCountry(); });
+
+/* Warn when the uploaded / auto-found photo is smaller than the export needs —
+   the canvas has to scale it up and it reads as pixelated. */
+function photoWarn(spec){
+  const el=$('cnPhotoWarn'); const d=spec && spec._photoSrcDims;
+  if(!d){ el.style.display='none'; return; }
+  const min=Math.min(d[0],d[1]);
+  if(min>=PHOTO_MIN_SIDE){ el.style.display='none'; return; }
+  el.textContent=`Heads up: this photo is ${d[0]}\u00d7${d[1]} px — under the ${PHOTO_MIN_SIDE}\u00d7${PHOTO_MIN_SIDE} the export needs, so it is scaled up and will look soft. Pick a larger photo if you can.`;
+  el.style.display='';
+}
 $('cnPhoto').addEventListener('change', e=>{
   const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader(); r.onload=()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec.photoDataUrl=r.result; countrySpec.photoSrc=null; countrySpec._photoSquared=false; $('cnPhotoName').textContent=f.name; ensurePhoto(countrySpec).then(reRenderCountry); };
+  const r=new FileReader(); r.onload=()=>{ if(!countrySpec) countrySpec=demoCountry(); countrySpec.photoDataUrl=r.result; countrySpec.photoSrc=null; countrySpec._photoSquared=false; countrySpec._photoSrcDims=null; $('cnPhotoName').textContent=f.name; ensurePhoto(countrySpec).then(()=>{ photoWarn(countrySpec); reRenderCountry(); }); };
   r.readAsDataURL(f); e.target.value='';
 });
 async function generateCountry(name){
   const c=await resolveCountry(name,{product:countryProduct});
   const photo=await fetchScenePhoto(c.scene);
-  countrySpec={ ...c, product:countryProduct, photoDataUrl:photo, photoSrc:null };
+  countrySpec={ ...c, product:countryProduct, photoDataUrl:photo, photoSrc:null,
+    palette: (countrySpec && countrySpec.palette) || 'ref',
+    titleTop: 'NOW AVAILABLE',
+    titleBottom: countryTitleBottom(c.country || name),
+    emphasis: c.country || name };
   await ensureGeo(); await ensureFlag(countrySpec, geoMod); await ensurePhoto(countrySpec);
 }
 $('cnGen').addEventListener('click', async ()=>{

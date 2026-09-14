@@ -72,45 +72,58 @@
 .aev.has-dev .aev-lede{max-width:560px;}
 .aev.has-dev .aev-card{top:600px;}
 
-/* ---------------- NEW-COUNTRY ANNOUNCEMENT ---------------- */
-.acn-logo{position:absolute;left:54px;bottom:48px;height:52px;width:auto;display:block;z-index:6;}
+/* ---------------- NEW-COUNTRY ANNOUNCEMENT ----------------
+   "NOW AVAILABLE IN <COUNTRY>" layout (v2, matches the approved Croatia post).
+   --acn-blue / --acn-red come from ACN_PALETTES in announce-render.js and are
+   set inline on .acn, so both colour treatments share this one stylesheet.
+   Every geometry value is in 1080-artboard pixels.                           */
 .acn{
   width:1080px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box;
   background:#dfe8f0;font-family:'Gotham Pro',system-ui,sans-serif;
+  --acn-blue:#2a3a8c; --acn-red:#a5323f;
 }
 .acn *{box-sizing:border-box;}
-/* photo is pre-cropped to a square data URI (see ensurePhoto), so a plain
-   square <img> fills the artboard exactly; object-fit kept for the brief
-   pre-crop live state. */
-.acn-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:32% 60%;
-  filter:saturate(.8) brightness(1.06);}
+
+/* Photo is pre-cropped to a square data URI at BAKE× (see ensurePhoto), so a
+   plain square <img> fills the artboard exactly and the 2× PNG export gets
+   native pixels. The pastel wash and the saturate/brightness grade are baked
+   into that canvas — do NOT re-apply them here or they double up. */
+.acn-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:32% 60%;}
 /* soft placeholder when no photo uploaded */
 .acn-photo-ph{position:absolute;inset:0;background:
   radial-gradient(90% 70% at 20% 12%, #eaf3fb 0%, rgba(234,243,251,0) 60%),
   linear-gradient(180deg, #eaf3fb 0%, #dbe7f1 46%, #c7d6e2 100%);}
-.acn-wash-top{position:absolute;inset:0;background:linear-gradient(to bottom,
-  rgba(255,255,255,.95) 0%, rgba(255,255,255,.82) 26%, rgba(255,255,255,.64) 52%,
-  rgba(255,255,255,.56) 78%, rgba(255,255,255,.54) 100%);}
-.acn-wash-warm{position:absolute;inset:0;background:radial-gradient(120% 90% at 20% 6%,
-  rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%);}
+
 /* Flag = a canvas-baked waving-cloth PNG (see ensureFlag). Shadow via
    filter:drop-shadow on the <img> (survives export; box-shadow does not). */
-.acn-flag{position:absolute;top:14px;right:-64px;width:672px;height:480px;transform:rotate(-3deg);}
+.acn-flag{position:absolute;top:-44px;right:-30px;width:760px;height:560px;transform:rotate(-8deg);}
 .acn-flag img{display:block;width:100%;height:100%;
-  filter:drop-shadow(-10px 16px 24px rgba(60,40,45,.20));}
-.acn-map{position:absolute;left:34px;top:410px;width:556px;height:516px;
-  filter:drop-shadow(5px 9px 16px rgba(70,60,80,.28));}
-.acn-map svg{display:block;width:100%;height:100%;}
-.acn-shield{position:absolute;left:300px;top:524px;width:116px;height:132px;}
-.acn-shield svg{display:block;width:100%;height:100%;}
+  filter:drop-shadow(-10px 16px 24px rgba(60,40,45,.18));}
+
+/* Product lockup top-left: brand mark + wordmark (SVG) + product name set in
+   Gotham Black to the same cap height. */
+.acn-lock{position:absolute;left:90px;top:96px;z-index:6;display:flex;align-items:center;gap:11px;}
+.acn-lock img{height:74px;width:auto;display:block;}
+.acn-lock span{font-weight:900;font-size:63px;line-height:1;letter-spacing:-.015em;
+  color:var(--acn-blue);position:relative;top:0;}
+
+/* Headline block. font-size / line-height are set inline per country name
+   length (headlineSize in announce-render.js). */
+.acn-title{position:absolute;left:100px;top:226px;width:900px;z-index:5;}
+.acn-h{font-weight:900;color:var(--acn-blue);letter-spacing:-.012em;}
+.acn-h .pl{color:var(--acn-red);}
+.acn-sub{margin-top:20px;font-weight:700;color:var(--acn-blue);line-height:1.2;letter-spacing:-.005em;}
+.acn-sub .reg{font-size:.45em;font-weight:700;vertical-align:super;line-height:0;}
+
+/* Country outline: stroke only, crimson, from the 1:50m atlas. The approval
+   badge is positioned by the renderer on the territory's projected centroid. */
+.acn-map{position:absolute;left:62px;top:522px;width:540px;height:470px;}
+.acn-map > svg{display:block;width:100%;height:100%;}
+.acn-shield{position:absolute;display:block;height:auto;
+  filter:drop-shadow(0 7px 14px rgba(80,25,35,.30));}
+
 .acn-product{position:absolute;right:-395px;bottom:-635px;height:1500px;width:auto;
   filter:drop-shadow(-10px 14px 34px rgba(40,30,35,.26));}
-.acn-title{position:absolute;left:70px;top:90px;z-index:5;}
-.acn-t-en{font-weight:700;color:#4568a9;font-size:70px;line-height:1.06;letter-spacing:-.5px;}
-.acn-t-en .reg{font-size:32px;font-weight:700;vertical-align:super;line-height:0;}
-.acn-t-en .pl{color:#d4213d;}
-.acn-t-pl{margin-top:16px;font-weight:500;color:#4568a9;font-size:48px;line-height:1.05;letter-spacing:-.3px;}
-.acn-t-pl .reg{font-size:22px;font-weight:500;vertical-align:super;line-height:0;}
 
 /* ---------------- panel edit fields (app chrome) ---------------- */
 .ann-f{display:block;margin-bottom:12px;}

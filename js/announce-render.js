@@ -37,15 +37,22 @@ export function renderEvent(spec){
   const foreground = dev
     ? `<img class="aev-dev ${esc(s.product)}" src="${esc(dev)}" alt="">`
     : `<img class="aev-bead" src="assets/illustrations/bead.png" alt="">`;
-  const conf = s.confLogoDataUrl
+  const hasConf = !!s.confLogoDataUrl;
+  const confTop = hasConf && s.confLogoPos === 'top';
+  const confBottom = hasConf && !confTop;
+  const confTopEl = confTop
+    ? `<div class="aev-conf-top"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
+  const confBottomEl = confBottom
     ? `<div class="aev-conf"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
   const html = `
-  <div class="aev${dev ? ' has-dev' : ''}">
+  <div class="aev${dev ? ' has-dev' : ''}${s.topic ? ' has-topic' : ''}${confTop ? ' has-conftop' : ''}">
     <div class="aev-stripes"></div>
     ${foreground}
+    ${confTopEl}
     <div class="aev-content">
       ${s.title ? `<h1 class="aev-headline">${esc(s.title)}</h1>` : ''}
       ${s.lede  ? `<p class="aev-lede">${esc(s.lede)}</p>` : ''}
+      ${s.topic ? `<p class="aev-topic">${esc(s.topic)}</p>` : ''}
     </div>
     <div class="aev-card">
       ${s.date ? `<div class="aev-row"><span class="aev-ico">${CAL_ICON}</span><span class="aev-date">${esc(s.date)}</span></div>` : ''}
@@ -53,9 +60,9 @@ export function renderEvent(spec){
       ${s.address ? `<div class="aev-addr">${esc(s.address)}</div>` : ''}
       ${s.booth ? `<div class="aev-row aev-booth-row"><span class="aev-ico">${BOOTH_ICON}</span><span class="aev-booth">${esc(s.booth)}</span></div>` : ''}
     </div>
-    <div class="aev-footer${conf ? ' cobrand' : ''}">
+    <div class="aev-footer${confBottom ? ' cobrand' : ''}">
       <img class="aev-eff" src="assets/logo/efferon-logo.svg" alt="Efferon">
-      ${conf}
+      ${confBottomEl}
     </div>
   </div>`;
   return node(html);

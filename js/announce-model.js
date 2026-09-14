@@ -23,6 +23,8 @@ export function newEvent() {
     product: '',           // '' | 'lps' | 'neo' -> product column instead of the granule bead
     booth: '',             // stand / booth number -> extra row in the detail card, only if filled
     confLogoDataUrl: null, // conference logo (data URI) -> right side of the footer, only if set
+    confLogoPos: 'bottom', // 'bottom' | 'top' -> conference logo bottom-right (footer) or top-right
+    topic: '',             // talk / session topic line, shown under the title + lede (optional)
   };
 }
 

@@ -60,6 +60,23 @@
 .aev-footer.cobrand .aev-eff{height:46px;}
 .aev-conf{height:70px;display:flex;align-items:center;}
 .aev-conf img{height:100%;width:auto;max-width:340px;object-fit:contain;display:block;}
+/* ---- TALK / SPEAKER mode: active when spec.topic is set ----
+   The talk topic becomes the hero (large, light, uppercase); the title turns
+   into a compact speaker name and the lede its role. Fully backward compatible:
+   with no topic the event renders exactly as the classic big-headline layout. */
+.aev-topic{color:#fff;font-weight:300;font-size:48px;line-height:1.16;letter-spacing:.005em;
+  text-transform:uppercase;max-width:640px;margin-top:38px;}
+.aev.has-dev .aev-topic{max-width:600px;}
+.aev.has-topic .aev-headline{font-size:37px;line-height:1.08;font-weight:700;letter-spacing:.02em;
+  text-transform:uppercase;margin-top:6px;max-width:600px;}
+.aev.has-topic .aev-lede{font-size:25px;font-weight:300;line-height:1.3;margin-top:10px;max-width:600px;}
+/* conference logo, TOP-RIGHT variant: sits directly on the gradient (matches the
+   reference). Use a transparent-background logo. */
+.aev-conf-top{position:absolute;top:52px;right:58px;z-index:6;display:flex;align-items:center;justify-content:flex-end;}
+.aev-conf-top img{height:122px;width:auto;max-width:360px;object-fit:contain;display:block;}
+/* keep the top text column clear of the top-right logo */
+.aev.has-conftop .aev-headline{max-width:540px;}
+.aev.has-conftop .aev-topic{max-width:560px;}
 /* stand / booth-number row in the detail card */
 .aev-booth{font-weight:500;font-size:30px;color:#fff;letter-spacing:.01em;line-height:1;padding-top:4px;}
 .aev-addr + .aev-booth-row{margin-top:24px;}

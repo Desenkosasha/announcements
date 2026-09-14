@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efferon Announcements</title>
-<link rel="stylesheet" href="announce.css?v=7">
+<link rel="stylesheet" href="announce.css?v=10">
 <style>
   /* ---- Efferon Gotham Pro (used inside the artboards, via announce.css) ---- */
   @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_black.ttf') format('truetype');font-weight:900;font-display:block;}
@@ -189,12 +189,18 @@
           <span class="fn" id="evConfName">placeholder</span>
           <button class="clr" id="evConfClr">Remove</button>
         </div>
-        <p class="note">Sits on the right of the white footer. PNG or SVG with transparent background works best.</p>
+        <p class="note">PNG or SVG with a transparent background works best.</p>
+        <label class="f" style="margin-top:14px"><span>Logo position</span></label>
+        <div class="seg2" id="evConfPos">
+          <button data-pos="bottom" class="on">Bottom right</button>
+          <button data-pos="top">Top right</button>
+        </div>
       </div>
 
       <div class="sec"><div class="sec-h">Text</div>
         <label class="f"><span>Title</span><textarea id="evTitle" rows="2"></textarea></label>
         <label class="f"><span>Lede</span><textarea id="evLede" rows="3"></textarea></label>
+        <label class="f"><span>Talk topic</span><textarea id="evTopic" rows="2" placeholder="e.g. your talk / session title (optional)"></textarea></label>
         <label class="f"><span>Date</span><input id="evDate" type="text"></label>
         <label class="f"><span>Venue</span><input id="evVenue" type="text"></label>
         <label class="f"><span>Address</span><input id="evAddr" type="text"></label>
@@ -250,9 +256,9 @@
 
 <script src="vendor/html-to-image.js"></script>
 <script type="module">
-import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=3';
-import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=7';
-import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=3';
+import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=4';
+import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=9';
+import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=4';
 import { elementToPngBlob } from './js/deck-export.js';
 import * as geoMod from './js/announce-geo.js?v=3';
 
@@ -282,11 +288,12 @@ refreshKeyBtn();
 
 /* ================= state ================= */
 let eventSpec = { ...newEvent(),
-  title:'Meet Efferon at ISICEM 2026',
-  lede:'Visit our team to discuss extracorporeal blood purification in sepsis and critical care.',
-  date:'March 17–20, 2026', venue:'SQUARE — Brussels Convention Centre',
-  address:'Rue Mont des Arts, 1000 Brussels, Belgium',
-  product:'lps', booth:'Booth 4.28', confLogoDataUrl:CONF_PLACEHOLDER };
+  title:'Ivan Bessonov',
+  lede:'CTO and co-founder',
+  topic:'Endotoxin and beyond: rethinking hemoadsorption in sepsis',
+  date:'September 11, 2026', venue:'Riga East University Hospital',
+  address:'', product:'lps', booth:'', confLogoDataUrl:CONF_PLACEHOLDER,
+  confLogoPos:'top' };
 let countrySpec = null, countryProduct='lps', geoReady=false;
 
 /* ================= fit / render ================= */
@@ -307,7 +314,9 @@ function fillEventFields(){
   $('evTitle').value=eventSpec.title||''; $('evLede').value=eventSpec.lede||'';
   $('evDate').value=eventSpec.date||''; $('evVenue').value=eventSpec.venue||'';
   $('evAddr').value=eventSpec.address||''; $('evBooth').value=eventSpec.booth||'';
+  $('evTopic').value=eventSpec.topic||'';
   document.querySelectorAll('#evProduct button').forEach(b=>b.classList.toggle('on', b.dataset.p===(eventSpec.product||'')));
+  document.querySelectorAll('#evConfPos button').forEach(b=>b.classList.toggle('on', b.dataset.pos===(eventSpec.confLogoPos||'bottom')));
 }
 
 let geoPromise=null;
@@ -343,11 +352,14 @@ window.addEventListener('resize', ()=>{
 });
 
 /* ================= EVENT wiring ================= */
-[['evTitle','title'],['evLede','lede'],['evDate','date'],['evVenue','venue'],['evAddr','address'],['evBooth','booth']].forEach(([id,key])=>{
+[['evTitle','title'],['evLede','lede'],['evTopic','topic'],['evDate','date'],['evVenue','venue'],['evAddr','address'],['evBooth','booth']].forEach(([id,key])=>{
   $(id).addEventListener('input', ()=>{ eventSpec[key]=$(id).value; renderEventStage(); });
 });
 document.querySelectorAll('#evProduct button').forEach(b=>{
   b.addEventListener('click', ()=>{ document.querySelectorAll('#evProduct button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.product=b.dataset.p; renderEventStage(); });
+});
+document.querySelectorAll('#evConfPos button').forEach(b=>{
+  b.addEventListener('click', ()=>{ document.querySelectorAll('#evConfPos button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.confLogoPos=b.dataset.pos; renderEventStage(); });
 });
 $('evConf').addEventListener('change', e=>{
   const f=e.target.files[0]; if(!f) return;
@@ -361,7 +373,7 @@ $('evGen').addEventListener('click', async ()=>{
   try{
     const g=await planEvent(text,{lang:'en'});
     // keep the current design (product/booth/logo), replace only the text fields
-    Object.assign(eventSpec, { title:g.title, lede:g.lede, date:g.date, venue:g.venue, address:g.address });
+    Object.assign(eventSpec, { title:g.title, lede:g.lede, topic:g.topic, date:g.date, venue:g.venue, address:g.address });
     fillEventFields(); renderEventStage(); toast('Fields generated. Fine-tune below.');
   }catch(err){ console.error(err); toast('Could not generate: '+String(err.message||err)); }
   finally{ btn.disabled=false; btn.textContent='Generate fields'; }

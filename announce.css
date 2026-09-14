@@ -70,11 +70,12 @@
 .aev.has-topic .aev-headline{font-size:37px;line-height:1.08;font-weight:700;letter-spacing:.02em;
   text-transform:uppercase;margin-top:6px;max-width:600px;}
 .aev.has-topic .aev-lede{font-size:25px;font-weight:300;line-height:1.3;margin-top:10px;max-width:600px;}
-/* conference logo, TOP-RIGHT variant: sits directly on the gradient (matches the
-   reference). Use a transparent-background logo. */
-.aev-conf-top{position:absolute;top:52px;right:58px;z-index:6;display:flex;align-items:center;justify-content:flex-end;}
-.aev-conf-top img{height:122px;width:auto;max-width:360px;object-fit:contain;display:block;}
-/* keep the top text column clear of the top-right logo */
+/* conference logo, TOP-RIGHT variant: on a white rounded chip so any logo
+   (dark, colourful, or low-contrast) reads cleanly over the gradient. */
+.aev-conf-top{position:absolute;top:50px;right:54px;z-index:6;display:flex;align-items:center;
+  background:#fff;border-radius:20px;padding:18px 26px;box-shadow:0 14px 34px rgba(60,15,40,.20);}
+.aev-conf-top img{height:92px;width:auto;max-width:300px;object-fit:contain;display:block;}
+/* keep the top text column clear of the top-right chip */
 .aev.has-conftop .aev-headline{max-width:540px;}
 .aev.has-conftop .aev-topic{max-width:560px;}
 /* stand / booth-number row in the detail card */

@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efferon Announcements</title>
-<link rel="stylesheet" href="announce.css?v=6">
+<link rel="stylesheet" href="announce.css?v=7">
 <style>
   /* ---- Efferon Gotham Pro (used inside the artboards, via announce.css) ---- */
   @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_black.ttf') format('truetype');font-weight:900;font-display:block;}
@@ -254,7 +254,7 @@ import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } 
 import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=7';
 import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=3';
 import { elementToPngBlob } from './js/deck-export.js';
-import * as geoMod from './js/announce-geo.js?v=2';
+import * as geoMod from './js/announce-geo.js?v=3';
 
 const $ = id => document.getElementById(id);
 const KEY_STORAGE = 'eff_key';
@@ -395,7 +395,12 @@ $('cnCountry').addEventListener('input', ()=>{
   ensureGeo().then(async()=>{
     if($('cnCountry').value!==name) return;                 // stale keystroke
     let iso=null; try{ iso=geoMod.resolveISO(name); }catch(_){ iso=null; }
-    if(!iso || iso===countrySpec.iso) return;
+    if(iso===countrySpec.iso) return;                        // no change
+    if(!iso){                                                // name no longer resolves (partial / unknown / cleared)
+      if(countrySpec.iso){ countrySpec.iso=null; countrySpec.flagDataUrl=null; countrySpec._flagIso=null;
+        if($('cnCountry').value===name) reRenderCountry(); }
+      return;
+    }
     countrySpec.iso=iso; countrySpec.flagDataUrl=null;
     await ensureFlag(countrySpec, geoMod);
     if($('cnCountry').value===name) reRenderCountry();

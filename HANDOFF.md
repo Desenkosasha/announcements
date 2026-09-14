@@ -12,6 +12,28 @@ Anthropic key from localStorage. Published on GitHub Pages behind a soft passwor
 - Local preview: `python3 -m http.server 8341 --directory ~/.superset/projects/efferon-announcements`
   → http://localhost:8341/index.html?mode=country (password gate: SHA-256 hash in `index.html`)
 
+## 3b. What changed 2026-09-14
+- **"LPS" baseline aligned** in the country lockup (the product label span had
+  `top:-3px`, lifting it above the Efferon wordmark; now `top:0`).
+- **Missing English country aliases added** (announce-geo.js): the English
+  "Turkey" (only "Türkiye" resolved before), plus England/Britain/America.
+  Additive only — never overwrites an existing alias.
+- **Stale flag/outline fixed**: typing a country then clearing it (or typing an
+  unresolvable/partial name) used to leave the previous flag + outline on the
+  card. The input handler now clears iso/flag and re-renders when the name no
+  longer resolves.
+- Cache versions bumped so browsers reload: announce.css v6->v7, announce-geo.js v2->v3.
+
+### Known corner cases still open (case-by-case)
+- **Antimeridian / overseas-territory geometry** (proven from the atlas): Russia,
+  USA, Fiji, New Zealand, Kiribati span ~360° of longitude, and France, the
+  Netherlands, Norway carry far-flung territories. `geoMercator().fitExtent` on
+  the full multipolygon shrinks the mainland to a speck and puts the badge in the
+  ocean. Fix needs a per-country call on which landmass to show — not done.
+- **RTL sublines** (UAE, Saudi, Israel...) and **wide scripts** (CJK/Thai) vs the
+  character-count `headlineSize`/`subSize` heuristic.
+- **Red emphasis word** silently absent if a custom line-2 omits the country name.
+
 ## 3. What changed in this session (2026-08-31)
 - **New-country template redesigned** to match the approved Croatia post: product lockup
   (mark + "Efferon®" + product name) top-left, uppercase two-line headline with the country

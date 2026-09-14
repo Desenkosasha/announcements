@@ -58,6 +58,12 @@ export async function initGeo() {
     _countries = lookup.countries;
     _aliasMap = lookup.aliasMap;
 
+    // Common English short-forms the vendored alias map omits (e.g. the
+    // English "Turkey" — only "Türkiye" was present). Additive only: never
+    // overwrite an alias that already exists.
+    const EXTRA_ALIASES = { turkey: 'TR', england: 'GB', britain: 'GB', america: 'US' };
+    for (const k in EXTRA_ALIASES) if (!(k in _aliasMap)) _aliasMap[k] = EXTRA_ALIASES[k];
+
     // numeric ISO id -> iso2, from the vendored lookup
     const numMap = lookup.numMap;
 

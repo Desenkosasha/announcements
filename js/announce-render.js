@@ -31,8 +31,27 @@ function node(html){
    exactly as before): s.product ('lps'|'neo') swaps the granule bead for a
    product column; s.booth adds a stand-number row; s.confLogoDataUrl puts a
    conference logo on the right of the footer (co-brand). */
+/* Speaker-mode auto-fit: step the topic hero and the speaker name down by
+   length so long talk titles / names don't run into the glass detail card.
+   line-height stays a unitless multiplier (in CSS), so it scales with these. */
+function topicSize(t){
+  const n = (t || '').length;
+  if(n <= 46)  return 48;
+  if(n <= 78)  return 42;
+  if(n <= 118) return 36;
+  return 31;
+}
+function speakerNameSize(t){
+  const n = (t || '').length;
+  if(n <= 22) return 37;
+  if(n <= 34) return 31;
+  return 27;
+}
+
 export function renderEvent(spec){
   const s = spec || {};
+  const nameStyle  = s.topic ? ` style="font-size:${speakerNameSize(s.title)}px"` : '';
+  const topicStyle = s.topic ? ` style="font-size:${topicSize(s.topic)}px"` : '';
   const dev = EVENT_DEVICE_SRC[s.product];        // undefined unless product set
   const foreground = dev
     ? `<img class="aev-dev ${esc(s.product)}" src="${esc(dev)}" alt="">`
@@ -50,9 +69,9 @@ export function renderEvent(spec){
     ${foreground}
     ${confTopEl}
     <div class="aev-content">
-      ${s.title ? `<h1 class="aev-headline">${esc(s.title)}</h1>` : ''}
+      ${s.title ? `<h1 class="aev-headline"${nameStyle}>${esc(s.title)}</h1>` : ''}
       ${s.lede  ? `<p class="aev-lede">${esc(s.lede)}</p>` : ''}
-      ${s.topic ? `<p class="aev-topic">${esc(s.topic)}</p>` : ''}
+      ${s.topic ? `<p class="aev-topic"${topicStyle}>${esc(s.topic)}</p>` : ''}
     </div>
     <div class="aev-card">
       ${s.date ? `<div class="aev-row"><span class="aev-ico">${CAL_ICON}</span><span class="aev-date">${esc(s.date)}</span></div>` : ''}

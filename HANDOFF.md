@@ -22,6 +22,10 @@ Anthropic key from localStorage. Published on GitHub Pages behind a soft passwor
   compatible). New spec fields: `topic`, `confLogoPos` ('bottom'|'top'). AI
   "Generate from text" can now fill `topic` too. Demo content = the reference post.
   Cache bumps: css v10, model v4, render v9, ai v4.
+- **Speaker-mode auto-fit:** the topic hero and the speaker name now step down
+  by length (topic 48/42/36/31px, name 37/31/27px) so long talk titles / names
+  clear the glass card instead of running under it. Cache: render v10, css v11
+  (top logo now on a white chip).
 - **"LPS" baseline aligned** in the country lockup (the product label span had
   `top:-3px`, lifting it above the Efferon wordmark; now `top:0`).
 - **Missing English country aliases added** (announce-geo.js): the English

@@ -75,7 +75,7 @@
 
 /* conference logo, TOP-RIGHT variant: on a white rounded chip so any logo
    (dark, colourful, or low-contrast) reads cleanly over the gradient. */
-.aev-conf-top{position:absolute;top:50px;right:54px;z-index:6;display:flex;align-items:center;
+.aev-conf-top{position:absolute;top:105px;right:54px;z-index:6;display:flex;align-items:center;
   background:#fff;border-radius:20px;padding:18px 26px;box-shadow:0 14px 34px rgba(60,15,40,.20);}
 .aev-conf-top img{height:92px;width:auto;max-width:300px;object-fit:contain;display:block;}
 /* keep the top headline clear of the top-right chip */

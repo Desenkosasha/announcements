@@ -29,7 +29,7 @@
 .aev-content{position:absolute;inset:0;padding:64px 62px;}
 .aev-headline{
   color:#fff;font-weight:700;font-size:72px;line-height:1.06;
-  letter-spacing:-.02em;max-width:1000px;margin:36px 0 0;
+  letter-spacing:-.02em;max-width:1000px;margin:10px 0 0;
 }
 .aev-lede{
   color:#fff;font-weight:300;font-size:29px;line-height:1.35;
@@ -75,7 +75,7 @@
 
 /* conference logo, TOP-RIGHT variant: on a white rounded chip so any logo
    (dark, colourful, or low-contrast) reads cleanly over the gradient. */
-.aev-conf-top{position:absolute;top:105px;right:54px;z-index:6;display:flex;align-items:center;
+.aev-conf-top{position:absolute;top:79px;right:54px;z-index:6;display:flex;align-items:center;
   background:#fff;border-radius:20px;padding:18px 26px;box-shadow:0 14px 34px rgba(60,15,40,.20);}
 .aev-conf-top img{height:92px;width:auto;max-width:300px;object-fit:contain;display:block;}
 /* keep the top headline clear of the top-right chip */

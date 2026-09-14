@@ -26,6 +26,12 @@ Anthropic key from localStorage. Published on GitHub Pages behind a soft passwor
   by length (topic 48/42/36/31px, name 37/31/27px) so long talk titles / names
   clear the glass card instead of running under it. Cache: render v10, css v11
   (top logo now on a white chip).
+- **Talk info moved into the card (2026-09-14, revised):** headline is classic
+  again ("Meet Efferon at ..."); the talk title + speaker name + role now live
+  INSIDE the glass detail card, above the date/venue rows. New spec fields
+  `speaker`, `speakerRole` (topic = talk title). The card anchors to the bottom
+  in talk mode and grows upward, so it always clears the footer. Talk title
+  auto-fits (32/28/25px). Cache: model v5, render v11, css v12, ai v5.
 - **"LPS" baseline aligned** in the country lockup (the product label span had
   `top:-3px`, lifting it above the Efferon wordmark; now `top:0`).
 - **Missing English country aliases added** (announce-geo.js): the English

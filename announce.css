@@ -60,24 +60,26 @@
 .aev-footer.cobrand .aev-eff{height:46px;}
 .aev-conf{height:70px;display:flex;align-items:center;}
 .aev-conf img{height:100%;width:auto;max-width:340px;object-fit:contain;display:block;}
-/* ---- TALK / SPEAKER mode: active when spec.topic is set ----
-   The talk topic becomes the hero (large, light, uppercase); the title turns
-   into a compact speaker name and the lede its role. Fully backward compatible:
-   with no topic the event renders exactly as the classic big-headline layout. */
-.aev-topic{color:#fff;font-weight:300;font-size:48px;line-height:1.16;letter-spacing:.005em;
-  text-transform:uppercase;max-width:640px;margin-top:38px;}
-.aev.has-dev .aev-topic{max-width:600px;}
-.aev.has-topic .aev-headline{font-size:37px;line-height:1.08;font-weight:700;letter-spacing:.02em;
-  text-transform:uppercase;margin-top:6px;max-width:600px;}
-.aev.has-topic .aev-lede{font-size:25px;font-weight:300;line-height:1.3;margin-top:10px;max-width:600px;}
+/* ---- TALK block inside the detail card (active when topic/speaker set) ----
+   The classic big headline stays at the top; the talk title + speaker name +
+   role live in the glass card above the date/venue rows. */
+.aev-talk-title{color:#fff;font-weight:600;font-size:32px;line-height:1.2;letter-spacing:-.01em;}
+.aev-talk-by{margin-top:16px;}
+.aev-talk-name{display:block;color:#fff;font-weight:700;font-size:27px;line-height:1.12;}
+.aev-talk-role{display:block;color:rgba(255,255,255,.82);font-weight:300;font-size:23px;line-height:1.24;margin-top:3px;}
+.aev-talk-div{height:1px;background:rgba(255,255,255,.24);margin:24px 0;}
+/* in talk mode the card carries more, so anchor it to the bottom and let it
+   grow upward — it always clears the footer regardless of content length. */
+.aev.has-talk .aev-card{top:auto;bottom:150px;}
+.aev.has-dev.has-talk .aev-card{top:auto;bottom:150px;}
+
 /* conference logo, TOP-RIGHT variant: on a white rounded chip so any logo
    (dark, colourful, or low-contrast) reads cleanly over the gradient. */
 .aev-conf-top{position:absolute;top:50px;right:54px;z-index:6;display:flex;align-items:center;
   background:#fff;border-radius:20px;padding:18px 26px;box-shadow:0 14px 34px rgba(60,15,40,.20);}
 .aev-conf-top img{height:92px;width:auto;max-width:300px;object-fit:contain;display:block;}
-/* keep the top text column clear of the top-right chip */
+/* keep the top headline clear of the top-right chip */
 .aev.has-conftop .aev-headline{max-width:540px;}
-.aev.has-conftop .aev-topic{max-width:560px;}
 /* stand / booth-number row in the detail card */
 .aev-booth{font-weight:500;font-size:30px;color:#fff;letter-spacing:.01em;line-height:1;padding-top:4px;}
 .aev-addr + .aev-booth-row{margin-top:24px;}

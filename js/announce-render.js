@@ -31,27 +31,18 @@ function node(html){
    exactly as before): s.product ('lps'|'neo') swaps the granule bead for a
    product column; s.booth adds a stand-number row; s.confLogoDataUrl puts a
    conference logo on the right of the footer (co-brand). */
-/* Speaker-mode auto-fit: step the topic hero and the speaker name down by
-   length so long talk titles / names don't run into the glass detail card.
-   line-height stays a unitless multiplier (in CSS), so it scales with these. */
-function topicSize(t){
+/* Auto-fit the talk title inside the detail card so long presentation titles
+   stay within the card width without ballooning its height. line-height is a
+   unitless multiplier (CSS), so it scales with the size. */
+function talkTitleSize(t){
   const n = (t || '').length;
-  if(n <= 46)  return 48;
-  if(n <= 78)  return 42;
-  if(n <= 118) return 36;
-  return 31;
-}
-function speakerNameSize(t){
-  const n = (t || '').length;
-  if(n <= 22) return 37;
-  if(n <= 34) return 31;
-  return 27;
+  if(n <= 52) return 32;
+  if(n <= 92) return 28;
+  return 25;
 }
 
 export function renderEvent(spec){
   const s = spec || {};
-  const nameStyle  = s.topic ? ` style="font-size:${speakerNameSize(s.title)}px"` : '';
-  const topicStyle = s.topic ? ` style="font-size:${topicSize(s.topic)}px"` : '';
   const dev = EVENT_DEVICE_SRC[s.product];        // undefined unless product set
   const foreground = dev
     ? `<img class="aev-dev ${esc(s.product)}" src="${esc(dev)}" alt="">`
@@ -63,17 +54,31 @@ export function renderEvent(spec){
     ? `<div class="aev-conf-top"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
   const confBottomEl = confBottom
     ? `<div class="aev-conf"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
+
+  // Talk block inside the detail card: talk title + speaker name + role.
+  const hasTalk = !!(s.topic || s.speaker || s.speakerRole);
+  const hasRows = !!(s.date || s.venue || s.address || s.booth);
+  const talkBlock = hasTalk ? `
+      <div class="aev-talk">
+        ${s.topic ? `<div class="aev-talk-title" style="font-size:${talkTitleSize(s.topic)}px">${esc(s.topic)}</div>` : ''}
+        ${(s.speaker || s.speakerRole) ? `<div class="aev-talk-by">
+          ${s.speaker ? `<span class="aev-talk-name">${esc(s.speaker)}</span>` : ''}
+          ${s.speakerRole ? `<span class="aev-talk-role">${esc(s.speakerRole)}</span>` : ''}
+        </div>` : ''}
+      </div>
+      ${hasRows ? `<div class="aev-talk-div"></div>` : ''}` : '';
+
   const html = `
-  <div class="aev${dev ? ' has-dev' : ''}${s.topic ? ' has-topic' : ''}${confTop ? ' has-conftop' : ''}">
+  <div class="aev${dev ? ' has-dev' : ''}${hasTalk ? ' has-talk' : ''}${confTop ? ' has-conftop' : ''}">
     <div class="aev-stripes"></div>
     ${foreground}
     ${confTopEl}
     <div class="aev-content">
-      ${s.title ? `<h1 class="aev-headline"${nameStyle}>${esc(s.title)}</h1>` : ''}
+      ${s.title ? `<h1 class="aev-headline">${esc(s.title)}</h1>` : ''}
       ${s.lede  ? `<p class="aev-lede">${esc(s.lede)}</p>` : ''}
-      ${s.topic ? `<p class="aev-topic"${topicStyle}>${esc(s.topic)}</p>` : ''}
     </div>
     <div class="aev-card">
+      ${talkBlock}
       ${s.date ? `<div class="aev-row"><span class="aev-ico">${CAL_ICON}</span><span class="aev-date">${esc(s.date)}</span></div>` : ''}
       ${s.venue ? `<div class="aev-row"><span class="aev-ico">${PIN_ICON}</span><span class="aev-venue">${esc(s.venue)}</span></div>` : ''}
       ${s.address ? `<div class="aev-addr">${esc(s.address)}</div>` : ''}

@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efferon Announcements</title>
-<link rel="stylesheet" href="announce.css?v=11">
+<link rel="stylesheet" href="announce.css?v=12">
 <style>
   /* ---- Efferon Gotham Pro (used inside the artboards, via announce.css) ---- */
   @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_black.ttf') format('truetype');font-weight:900;font-display:block;}
@@ -200,7 +200,9 @@
       <div class="sec"><div class="sec-h">Text</div>
         <label class="f"><span>Title</span><textarea id="evTitle" rows="2"></textarea></label>
         <label class="f"><span>Lede</span><textarea id="evLede" rows="3"></textarea></label>
-        <label class="f"><span>Talk topic</span><textarea id="evTopic" rows="2" placeholder="e.g. your talk / session title (optional)"></textarea></label>
+        <label class="f"><span>Talk topic</span><textarea id="evTopic" rows="2" placeholder="talk / presentation title (shown in the card)"></textarea></label>
+        <label class="f"><span>Speaker name</span><input id="evSpeaker" type="text" placeholder="e.g. Ivan Bessonov (optional)"></label>
+        <label class="f"><span>Speaker role</span><input id="evRole" type="text" placeholder="e.g. CTO and co-founder (optional)"></label>
         <label class="f"><span>Date</span><input id="evDate" type="text"></label>
         <label class="f"><span>Venue</span><input id="evVenue" type="text"></label>
         <label class="f"><span>Address</span><input id="evAddr" type="text"></label>
@@ -256,9 +258,9 @@
 
 <script src="vendor/html-to-image.js"></script>
 <script type="module">
-import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=4';
-import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=10';
-import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=4';
+import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=5';
+import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=11';
+import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=5';
 import { elementToPngBlob } from './js/deck-export.js';
 import * as geoMod from './js/announce-geo.js?v=3';
 
@@ -288,9 +290,10 @@ refreshKeyBtn();
 
 /* ================= state ================= */
 let eventSpec = { ...newEvent(),
-  title:'Ivan Bessonov',
-  lede:'CTO and co-founder',
+  title:'Meet Efferon at ISICEM 2026',
+  lede:'Visit our team to discuss extracorporeal blood purification in sepsis and critical care.',
   topic:'Endotoxin and beyond: rethinking hemoadsorption in sepsis',
+  speaker:'Ivan Bessonov', speakerRole:'CTO and co-founder',
   date:'September 11, 2026', venue:'Riga East University Hospital',
   address:'', product:'lps', booth:'', confLogoDataUrl:CONF_PLACEHOLDER,
   confLogoPos:'top' };
@@ -315,6 +318,7 @@ function fillEventFields(){
   $('evDate').value=eventSpec.date||''; $('evVenue').value=eventSpec.venue||'';
   $('evAddr').value=eventSpec.address||''; $('evBooth').value=eventSpec.booth||'';
   $('evTopic').value=eventSpec.topic||'';
+  $('evSpeaker').value=eventSpec.speaker||''; $('evRole').value=eventSpec.speakerRole||'';
   document.querySelectorAll('#evProduct button').forEach(b=>b.classList.toggle('on', b.dataset.p===(eventSpec.product||'')));
   document.querySelectorAll('#evConfPos button').forEach(b=>b.classList.toggle('on', b.dataset.pos===(eventSpec.confLogoPos||'bottom')));
 }
@@ -352,7 +356,7 @@ window.addEventListener('resize', ()=>{
 });
 
 /* ================= EVENT wiring ================= */
-[['evTitle','title'],['evLede','lede'],['evTopic','topic'],['evDate','date'],['evVenue','venue'],['evAddr','address'],['evBooth','booth']].forEach(([id,key])=>{
+[['evTitle','title'],['evLede','lede'],['evTopic','topic'],['evSpeaker','speaker'],['evRole','speakerRole'],['evDate','date'],['evVenue','venue'],['evAddr','address'],['evBooth','booth']].forEach(([id,key])=>{
   $(id).addEventListener('input', ()=>{ eventSpec[key]=$(id).value; renderEventStage(); });
 });
 document.querySelectorAll('#evProduct button').forEach(b=>{
@@ -373,7 +377,7 @@ $('evGen').addEventListener('click', async ()=>{
   try{
     const g=await planEvent(text,{lang:'en'});
     // keep the current design (product/booth/logo), replace only the text fields
-    Object.assign(eventSpec, { title:g.title, lede:g.lede, topic:g.topic, date:g.date, venue:g.venue, address:g.address });
+    Object.assign(eventSpec, { title:g.title, lede:g.lede, topic:g.topic, speaker:g.speaker, speakerRole:g.speakerRole, date:g.date, venue:g.venue, address:g.address });
     fillEventFields(); renderEventStage(); toast('Fields generated. Fine-tune below.');
   }catch(err){ console.error(err); toast('Could not generate: '+String(err.message||err)); }
   finally{ btn.disabled=false; btn.textContent='Generate fields'; }

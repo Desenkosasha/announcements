@@ -24,7 +24,9 @@ export function newEvent() {
     booth: '',             // stand / booth number -> extra row in the detail card, only if filled
     confLogoDataUrl: null, // conference logo (data URI) -> right side of the footer, only if set
     confLogoPos: 'bottom', // 'bottom' | 'top' -> conference logo bottom-right (footer) or top-right
-    topic: '',             // talk / session topic line, shown under the title + lede (optional)
+    topic: '',             // talk / presentation title -> shown inside the detail card (optional)
+    speaker: '',           // speaker name -> inside the detail card (optional)
+    speakerRole: '',       // speaker role / position -> inside the detail card (optional)
   };
 }
 

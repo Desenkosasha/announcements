@@ -28,7 +28,9 @@ const EVENT_SCHEMA = {
     date:    { type: 'string', description: 'Event date(s) as shown, e.g. "June 11–12, 2026". Use an en-dash for ranges. Empty string if unknown.' },
     venue:   { type: 'string', description: 'Venue name, e.g. "Kellogg Conference Hotel Capitol Hill at Gallaudet University". Empty string if unknown.' },
     address: { type: 'string', description: 'Street / city address, e.g. "800 Florida Ave NE, Washington, DC". Empty string if unknown.' },
-    topic:   { type: 'string', description: 'The talk / session topic or presentation title, if the source names one (e.g. "Selective LPS hemoadsorption in septic shock"). Empty string if none.' },
+    topic:   { type: 'string', description: 'The talk / session / presentation title, if the source names one (e.g. "Selective LPS hemoadsorption in septic shock"). Empty string if none.' },
+    speaker: { type: 'string', description: 'The name of the person giving the talk, if named (e.g. "Ivan Bessonov"). Empty string if none.' },
+    speakerRole: { type: 'string', description: 'The speaker\'s role / job title, if named (e.g. "CTO and co-founder"). Empty string if none.' },
   },
 };
 
@@ -84,7 +86,8 @@ RULES
 - title: the headline (often "Meet Efferon at <event>"). Concise, sentence case, no trailing period.
 - lede: one short supporting paragraph, or empty.
 - date / venue / address: exactly as given. Use an en-dash (–) for date ranges (e.g. "June 11–12, 2026").
-- topic: the talk or session title if the source names one, else empty string.
+- topic: the talk / presentation title if the source names one, else empty string.
+- speaker / speakerRole: the presenter's name and role if the source names them, else empty strings.
 - No em-dashes (—) anywhere in copy; use commas/colons/periods.
 - Output must satisfy the JSON schema.`;
 
@@ -100,7 +103,7 @@ export async function planEvent(text, { lang = 'en' } = {}) {
   try { parsed = JSON.parse(raw); }
   catch (e) { throw new Error('The AI response was not valid JSON: ' + e.message); }
 
-  return { ...newEvent(), lang, ...pick(parsed, ['title', 'lede', 'date', 'venue', 'address', 'topic']) };
+  return { ...newEvent(), lang, ...pick(parsed, ['title', 'lede', 'date', 'venue', 'address', 'topic', 'speaker', 'speakerRole']) };
 }
 
 /* ---------------- country ---------------- */

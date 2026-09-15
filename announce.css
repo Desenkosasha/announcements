@@ -85,7 +85,7 @@
 .aev-addr + .aev-booth-row{margin-top:24px;}
 /* product device column bottom-right (replaces the granule bead) */
 .aev-dev{position:absolute;pointer-events:none;filter:drop-shadow(-14px 20px 32px rgba(60,15,40,.34));}
-.aev-dev.lps{height:1020px;right:60px;bottom:-306px;}
+.aev-dev.lps{height:1020px;right:30px;bottom:-306px;}
 .aev-dev.neo{height:700px;right:44px;bottom:132px;}
 /* narrow the text column so the device owns the right side */
 .aev.has-dev .aev-headline{max-width:600px;}

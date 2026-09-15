@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efferon Announcements</title>
-<link rel="stylesheet" href="announce.css?v=15">
+<link rel="stylesheet" href="announce.css?v=17">
 <style>
   /* ---- Efferon Gotham Pro (used inside the artboards, via announce.css) ---- */
   @font-face{font-family:'Gotham Pro';src:url('assets/fonts/gothampro_black.ttf') format('truetype');font-weight:900;font-display:block;}
@@ -82,6 +82,11 @@
   .btn-ghost{background:#f0f0f2;color:var(--ink);}
   .btn-ghost:hover{background:#e8e8ea;}
   .btn + .btn{margin-top:9px;}
+
+  /* slider row (background strength) */
+  .f.rng span{display:flex;justify-content:space-between;align-items:baseline;}
+  .f.rng span b{font-weight:500;color:var(--ink);}
+  .f.rng input[type=range]{width:100%;accent-color:var(--coral);margin-top:2px;}
 
   /* upload row */
   .upl{display:flex;align-items:center;gap:10px;}
@@ -177,7 +182,26 @@
       </div>
 
       <div class="sec"><div class="sec-h">Design</div>
-        <label class="f"><span>Product column</span></label>
+        <label class="f"><span>Background</span></label>
+        <div class="seg2" id="evBg">
+          <button data-bg="gradient" class="on">Gradient</button>
+          <button data-bg="photo">Photo + gradient</button>
+          <button data-bg="duotone">Duotone</button>
+        </div>
+        <div id="evPhotoRow" style="display:none">
+          <div class="upl" style="margin-top:12px">
+            <label for="evPhoto">Upload photo</label>
+            <input id="evPhoto" type="file" accept="image/*">
+            <span class="fn" id="evPhotoName">none</span>
+            <button class="clr" id="evPhotoClr">Remove</button>
+          </div>
+          <label class="f rng" style="margin-top:12px"><span>Gradient strength <b id="evKVal">62%</b></span>
+            <input id="evK" type="range" min="0" max="100" value="62">
+          </label>
+          <p class="note">Use a photo at least 2160&times;2160&nbsp;px (the post exports at 2160&times;2160). <b>Photo + gradient</b> keeps the post recognisably Efferon; <b>Duotone</b> turns any photo black-and-white and recolours it with the brand gradient. Move the slider until the headline reads cleanly.</p>
+          <p class="note" id="evPhotoWarn" style="display:none"></p>
+        </div>
+        <label class="f" style="margin-top:14px"><span>Product column</span></label>
         <div class="seg2" id="evProduct">
           <button data-p="lps" class="on">LPS</button>
           <button data-p="neo">NEO</button>
@@ -195,6 +219,12 @@
           <button data-pos="bottom" class="on">Bottom right</button>
           <button data-pos="top">Top right</button>
         </div>
+        <label class="f" style="margin-top:14px"><span>White plate under the logo</span></label>
+        <div class="seg2" id="evConfPlate">
+          <button data-plate="1" class="on">Plate</button>
+          <button data-plate="0">No plate</button>
+        </div>
+        <p class="note">Top-right position only. Without the plate the logo sits straight on the background &mdash; good for a white or light logo, invisible for a dark one.</p>
       </div>
 
       <div class="sec"><div class="sec-h">Text</div>
@@ -258,8 +288,8 @@
 
 <script src="vendor/html-to-image.js"></script>
 <script type="module">
-import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=5';
-import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=11';
+import { newEvent, newCountry, demoCountry, countryTitleBottom, ANNOUNCE_DIMS } from './js/announce-model.js?v=7';
+import { renderEvent, renderCountry, ensureFlag, ensurePhoto, PHOTO_MIN_SIDE } from './js/announce-render.js?v=13';
 import { planEvent, resolveCountry, fetchScenePhoto } from './js/announce-ai.js?v=5';
 import { elementToPngBlob } from './js/deck-export.js';
 import * as geoMod from './js/announce-geo.js?v=3';
@@ -296,7 +326,8 @@ let eventSpec = { ...newEvent(),
   speaker:'Ivan Bessonov', speakerRole:'CTO and co-founder',
   date:'September 11, 2026', venue:'Riga East University Hospital',
   address:'', product:'lps', booth:'', confLogoDataUrl:CONF_PLACEHOLDER,
-  confLogoPos:'top' };
+  confLogoPos:'top', confLogoPlate:true,
+  bg:'gradient', photoDataUrl:null, bgStrength:.62 };
 let countrySpec = null, countryProduct='lps', geoReady=false;
 
 /* ================= fit / render ================= */
@@ -321,6 +352,11 @@ function fillEventFields(){
   $('evSpeaker').value=eventSpec.speaker||''; $('evRole').value=eventSpec.speakerRole||'';
   document.querySelectorAll('#evProduct button').forEach(b=>b.classList.toggle('on', b.dataset.p===(eventSpec.product||'')));
   document.querySelectorAll('#evConfPos button').forEach(b=>b.classList.toggle('on', b.dataset.pos===(eventSpec.confLogoPos||'bottom')));
+  document.querySelectorAll('#evConfPlate button').forEach(b=>b.classList.toggle('on', (b.dataset.plate==='1')===(eventSpec.confLogoPlate!==false)));
+  document.querySelectorAll('#evBg button').forEach(b=>b.classList.toggle('on', b.dataset.bg===(eventSpec.bg||'gradient')));
+  $('evPhotoRow').style.display = (eventSpec.bg||'gradient')==='gradient' ? 'none' : '';
+  $('evK').value = Math.round((eventSpec.bgStrength==null?.62:eventSpec.bgStrength)*100);
+  $('evKVal').textContent = $('evK').value + '%';
 }
 
 let geoPromise=null;
@@ -361,6 +397,49 @@ window.addEventListener('resize', ()=>{
 });
 document.querySelectorAll('#evProduct button').forEach(b=>{
   b.addEventListener('click', ()=>{ document.querySelectorAll('#evProduct button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.product=b.dataset.p; renderEventStage(); });
+});
+/* Background: gradient (default) / photo under the brand gradient / duotone.
+   The photo itself is kept on the spec even while 'Gradient' is selected, so
+   switching back and forth never loses the upload. */
+document.querySelectorAll('#evBg button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#evBg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    eventSpec.bg=b.dataset.bg;
+    $('evPhotoRow').style.display = eventSpec.bg==='gradient' ? 'none' : '';
+    renderEventStage();
+  });
+});
+$('evPhoto').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    eventSpec.photoDataUrl=r.result; $('evPhotoName').textContent=f.name;
+    const probe=new Image();
+    probe.onload=()=>{ evPhotoWarn([probe.naturalWidth, probe.naturalHeight]); };
+    probe.src=r.result;
+    if((eventSpec.bg||'gradient')==='gradient'){
+      eventSpec.bg='photo'; fillEventFields();
+    }
+    renderEventStage();
+  };
+  r.readAsDataURL(f);
+});
+$('evPhotoClr').addEventListener('click', ()=>{
+  eventSpec.photoDataUrl=null; $('evPhotoName').textContent='none'; evPhotoWarn(null); renderEventStage();
+});
+$('evK').addEventListener('input', e=>{
+  eventSpec.bgStrength=e.target.value/100; $('evKVal').textContent=e.target.value+'%'; renderEventStage();
+});
+/* Same low-resolution guard the country template uses: the post exports at
+   2160x2160, so a smaller photo has to be scaled up and looks soft. */
+function evPhotoWarn(dims){
+  const el=$('evPhotoWarn');
+  if(!dims || Math.min(dims[0],dims[1])>=PHOTO_MIN_SIDE){ el.style.display='none'; el.textContent=''; return; }
+  el.style.display='';
+  el.textContent=`Heads up: this photo is ${dims[0]}\u00d7${dims[1]} px — under the ${PHOTO_MIN_SIDE}\u00d7${PHOTO_MIN_SIDE} the export needs, so it is scaled up and will look soft.`;
+}
+document.querySelectorAll('#evConfPlate button').forEach(b=>{
+  b.addEventListener('click', ()=>{ document.querySelectorAll('#evConfPlate button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.confLogoPlate=b.dataset.plate==='1'; renderEventStage(); });
 });
 document.querySelectorAll('#evConfPos button').forEach(b=>{
   b.addEventListener('click', ()=>{ document.querySelectorAll('#evConfPos button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); eventSpec.confLogoPos=b.dataset.pos; renderEventStage(); });

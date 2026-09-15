@@ -24,6 +24,13 @@ export function newEvent() {
     booth: '',             // stand / booth number -> extra row in the detail card, only if filled
     confLogoDataUrl: null, // conference logo (data URI) -> right side of the footer, only if set
     confLogoPos: 'bottom', // 'bottom' | 'top' -> conference logo bottom-right (footer) or top-right
+    confLogoPlate: true,   // top-right only: white rounded plate behind the logo (false = logo sits bare on the background)
+    // Background: the brand gradient, or the editor's own photo under one of two
+    // treatments that keep the white text readable (see .aev.bg-* in announce.css).
+    bg: 'gradient',        // 'gradient' | 'photo' (brand gradient over the photo) | 'duotone' (b/w photo recoloured by the gradient)
+    photoDataUrl: null,    // background photo (data URI); ignored while bg === 'gradient'
+    bgStrength: 0.62,      // 0..1 — density of the gradient laid over the photo
+
     topic: '',             // talk / presentation title -> shown inside the detail card (optional)
     speaker: '',           // speaker name -> inside the detail card (optional)
     speakerRole: '',       // speaker role / position -> inside the detail card (optional)

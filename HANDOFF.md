@@ -1,6 +1,6 @@
 # Handoff — Efferon Announcements
 
-_Updated 2026-08-31_
+_Updated 2026-09-15_
 
 ## 1. What is this?
 Static internal tool that builds 1080×1080 social posts: **Event** ("Meet Efferon at …")
@@ -11,6 +11,37 @@ Anthropic key from localStorage. Published on GitHub Pages behind a soft passwor
 - Source: `~/.superset/projects/efferon-announcements`
 - Local preview: `python3 -m http.server 8341 --directory ~/.superset/projects/efferon-announcements`
   → http://localhost:8341/index.html?mode=country (password gate: SHA-256 hash in `index.html`)
+
+## 3a. What changed 2026-09-15
+- **White plate under the top-right conference logo is now optional.** New spec
+  field `confLogoPlate` (default `true` -> unchanged look). UI: *White plate
+  under the logo -> Plate / No plate*, under *Logo position* in the Event panel.
+  Off = `.aev-conf-top.bare` (transparent, no shadow, no padding): right for a
+  white/light logo, wrong for a dark one — the panel note says so.
+- **Event background: gradient / photo + gradient / duotone.** New spec fields
+  `bg` ('gradient' | 'photo' | 'duotone'), `photoDataUrl`, `bgStrength` (0..1,
+  default .62). `bg:'gradient'` (the default) emits neither background layer, so
+  every existing post renders byte-identically. The two photo modes prepend
+  `<img class="aev-photo">` + `<div class="aev-veil">`:
+  - *Photo + gradient* — the brand gradient over the photo at `--k` opacity.
+  - *Duotone* — photo to `grayscale(1) brightness(.52)`, gradient on top in
+    `mix-blend-mode:screen`, so any photo comes out in brand colours.
+  The gradient is declared once as `--aev-grad` on `.aev` and re-used by both
+  veils — do not fork it. Uploading a photo while the mode is still *Gradient*
+  switches to *Photo + gradient* automatically; switching back to *Gradient*
+  keeps the upload on the spec, it is just not rendered.
+  **The photo is deliberately NOT canvas-baked** (unlike the country template):
+  html-to-image embeds the source file and rasterises at the export's 2×, so a
+  >=2160 px photo stays sharp. Verified end-to-end — a 3000x3000 upload exports
+  at 2160x2160 with the blend mode and CSS filters intact. Photos under 2160 px
+  trigger the same soft-photo warning the country tab has.
+  Cache: css v17, model v7, render v13.
+- **Tested before shipping, not committed:** `sandbox-photo-bg.html` compared
+  seven treatments (raw / brand gradient / dark veil / duotone / local scrim /
+  blur) on one photo with a real 2160x2160 export per tile. Sasha picked
+  gradient + *photo + gradient* + *duotone*; the other four were dropped. The
+  file stays local on purpose — it has no password gate and must not go onto
+  GitHub Pages.
 
 ## 3b. What changed 2026-09-14
 - **Event template — talk/speaker mode + logo position.** Added a **Talk topic**

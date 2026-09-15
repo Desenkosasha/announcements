@@ -43,6 +43,17 @@ function talkTitleSize(t){
 
 export function renderEvent(spec){
   const s = spec || {};
+  /* Background: brand gradient (default) or the editor's own photo under one of
+     two treatments. The photo is a plain <img> — NOT canvas-baked — so the 2×
+     PNG export rasterises it at 2160 px from the original file (see the country
+     template's BAKE note for why baking would have cost resolution here). */
+  const bg = (s.bg === 'photo' || s.bg === 'duotone') && s.photoDataUrl ? s.bg : 'gradient';
+  const bgLayers = bg === 'gradient' ? '' :
+    `<img class="aev-photo" src="${esc(s.photoDataUrl)}" alt="">`
+    + `<div class="aev-veil"></div>`;
+  const bgClass = bg === 'gradient' ? '' : (bg === 'photo' ? ' bg-photo' : ' bg-duo');
+  const bgVar = bg === 'gradient' ? '' :
+    ` style="--k:${Math.max(0, Math.min(1, s.bgStrength == null ? 0.62 : +s.bgStrength))}"`;
   const dev = EVENT_DEVICE_SRC[s.product];        // undefined unless product set
   const foreground = dev
     ? `<img class="aev-dev ${esc(s.product)}" src="${esc(dev)}" alt="">`
@@ -50,8 +61,9 @@ export function renderEvent(spec){
   const hasConf = !!s.confLogoDataUrl;
   const confTop = hasConf && s.confLogoPos === 'top';
   const confBottom = hasConf && !confTop;
+  // top-right logo: the white plate is optional (s.confLogoPlate === false -> bare logo)
   const confTopEl = confTop
-    ? `<div class="aev-conf-top"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
+    ? `<div class="aev-conf-top${s.confLogoPlate === false ? ' bare' : ''}"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
   const confBottomEl = confBottom
     ? `<div class="aev-conf"><img src="${esc(s.confLogoDataUrl)}" alt=""></div>` : '';
 
@@ -69,7 +81,8 @@ export function renderEvent(spec){
       ${hasRows ? `<div class="aev-talk-div"></div>` : ''}` : '';
 
   const html = `
-  <div class="aev${dev ? ' has-dev' : ''}${hasTalk ? ' has-talk' : ''}${confTop ? ' has-conftop' : ''}">
+  <div class="aev${dev ? ' has-dev' : ''}${hasTalk ? ' has-talk' : ''}${confTop ? ' has-conftop' : ''}${bgClass}"${bgVar}>
+    ${bgLayers}
     <div class="aev-stripes"></div>
     ${foreground}
     ${confTopEl}

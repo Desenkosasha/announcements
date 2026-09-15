@@ -9,12 +9,31 @@
 .aev{
   width:1080px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box;
   font-family:'Gotham Pro',system-ui,sans-serif;
-  /* brand warm gradient — sanctioned stops only: coral #e16f79 -> violet #896896 -> blue #4568a9 */
-  background:
+  /* brand warm gradient — sanctioned stops only: coral #e16f79 -> violet #896896 -> blue #4568a9.
+     Declared once as --aev-grad because the photo backgrounds re-use the very
+     same gradient as an overlay; keep the two in sync by construction. */
+  --aev-grad:
     radial-gradient(116% 106% at 90% 6%, #e16f79 0%, rgba(225,111,121,0) 58%),
     radial-gradient(120% 116% at 6% 100%, #4568a9 0%, rgba(69,104,169,0) 60%),
     linear-gradient(210deg, #e16f79 0%, #896896 54%, #4568a9 100%);
+  background:var(--aev-grad);
 }
+
+/* ---- photo backgrounds (only when event.bg is 'photo' or 'duotone' and a photo
+   is set; otherwise neither layer is emitted and the template is untouched).
+   --k (0..1) is the overlay density, set inline from spec.bgStrength.
+   A plain <img>, deliberately not canvas-baked: html-to-image embeds the source
+   file and rasterises it at the export's 2× scale, so a ≥2160 px photo stays
+   sharp. Everything here survives the export (blend modes and CSS filters were
+   round-tripped through html-to-image before shipping). ---- */
+.aev-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+.aev-veil{position:absolute;inset:0;pointer-events:none;}
+/* the brand gradient laid over the photo — the post still reads as Efferon */
+.aev.bg-photo .aev-veil{background:var(--aev-grad);opacity:var(--k,.62);}
+/* duotone: the photo goes black-and-white and the gradient recolours it */
+.aev.bg-duo .aev-photo{filter:grayscale(1) contrast(1.08) brightness(.52);}
+.aev.bg-duo .aev-veil{background:var(--aev-grad);mix-blend-mode:screen;
+  opacity:calc(.45 + var(--k,.62) * .55);}
 .aev *{box-sizing:border-box;}
 .aev-stripes{
   position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
@@ -78,6 +97,9 @@
 .aev-conf-top{position:absolute;top:79px;right:54px;z-index:6;display:flex;align-items:center;
   background:#fff;border-radius:20px;padding:18px 26px;box-shadow:0 14px 34px rgba(60,15,40,.20);}
 .aev-conf-top img{height:92px;width:auto;max-width:300px;object-fit:contain;display:block;}
+/* plate off: the logo sits straight on the background (use only for a light /
+   white logo on the gradient, or the logo disappears). */
+.aev-conf-top.bare{background:transparent;box-shadow:none;padding:0;border-radius:0;}
 /* keep the top headline clear of the top-right chip */
 .aev.has-conftop .aev-headline{max-width:540px;}
 /* stand / booth-number row in the detail card */
